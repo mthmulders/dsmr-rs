@@ -9,11 +9,11 @@ fn init_logger(debug_logging: bool) {
     };
     let config = &simplelog::Config::default();
 
-    return simplelog::CombinedLogger::init(vec![
+    simplelog::CombinedLogger::init(vec![
         simplelog::TermLogger::new(level, config.clone(), simplelog::TerminalMode::Mixed),
         simplelog::WriteLogger::new(level, config.clone(), file),
     ])
-    .unwrap();
+    .unwrap()
 }
 
 pub fn main() {
