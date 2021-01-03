@@ -1,4 +1,4 @@
-extern crate simplelog;
+mod dsmr;
 
 fn init_logger(debug_logging: bool) {
     let file = std::fs::File::create("dsmr-rs.log").unwrap();
@@ -33,4 +33,5 @@ pub fn main() {
     init_logger(debug_logging);
 
     log::info!("dsmr-rs starting...");
+    let serial_settings = dsmr::settings::serial_settings(settings);
 }
