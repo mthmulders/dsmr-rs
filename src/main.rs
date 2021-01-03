@@ -2,16 +2,21 @@ extern crate simplelog;
 
 fn init_logger(debug_logging: bool) {
     let file = std::fs::File::create("dsmr-rs.log").unwrap();
-    let level = if debug_logging {
+    let console_level = if debug_logging {
         simplelog::LevelFilter::Debug
     } else {
         simplelog::LevelFilter::Info
     };
-    let config = &simplelog::Config::default();
+    let file_level = if debug_logging {
+        simplelog::LevelFilter::Trace
+    } else {
+        simplelog::LevelFilter::Info
+    };
+    let config = simplelog::Config::default();
 
     simplelog::CombinedLogger::init(vec![
-        simplelog::TermLogger::new(level, config.clone(), simplelog::TerminalMode::Mixed),
-        simplelog::WriteLogger::new(level, config.clone(), file),
+        simplelog::TermLogger::new(console_level, config.clone(), simplelog::TerminalMode::Mixed),
+        simplelog::WriteLogger::new(file_level, config.clone(), file),
     ])
     .unwrap()
 }
