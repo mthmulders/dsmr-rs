@@ -14,7 +14,9 @@ fn read_serial_settings(settings: HashMap<String, String>) -> Result<SerialSetti
     let serial_baudrate = match settings.get("serial_baudrate") {
         Some(value) => match value.parse::<u32>() {
             Ok(value) => value,
-            Err(_) => return Err("Setting serial_baudrate can not be converted to a number".to_string())
+            Err(_) => {
+                return Err("Setting serial_baudrate can not be converted to a number".to_string())
+            }
         },
         None => return Err("Setting serial_baudrate not defined".to_string()),
     };
