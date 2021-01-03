@@ -15,7 +15,11 @@ fn init_logger(debug_logging: bool) {
     let config = simplelog::Config::default();
 
     simplelog::CombinedLogger::init(vec![
-        simplelog::TermLogger::new(console_level, config.clone(), simplelog::TerminalMode::Mixed),
+        simplelog::TermLogger::new(
+            console_level,
+            config.clone(),
+            simplelog::TerminalMode::Mixed,
+        ),
         simplelog::WriteLogger::new(file_level, config.clone(), file),
     ])
     .unwrap()
