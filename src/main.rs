@@ -20,7 +20,7 @@ fn init_logger(debug_logging: bool) {
             config.clone(),
             simplelog::TerminalMode::Mixed,
         ),
-        simplelog::WriteLogger::new(file_level, config.clone(), file),
+        simplelog::WriteLogger::new(file_level, config, file),
     ])
     .unwrap()
 }
@@ -37,5 +37,5 @@ pub fn main() {
     init_logger(debug_logging);
 
     log::info!("dsmr-rs starting...");
-    let serial_settings = dsmr::settings::serial_settings(settings);
+    let _serial_settings = dsmr::settings::serial_settings(settings);
 }
