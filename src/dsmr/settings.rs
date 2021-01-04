@@ -36,6 +36,7 @@ pub fn serial_settings(settings: config::Config) -> Result<SerialSettings, Strin
 }
 
 mod tests {
+    #[allow(unused_imports)]
     use super::*;
 
     #[test]
