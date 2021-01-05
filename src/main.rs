@@ -37,5 +37,6 @@ pub fn main() {
     init_logger(debug_logging);
 
     log::info!("dsmr-rs starting...");
-    let _serial_settings = dsmr::settings::serial_settings(settings);
+    let serial_settings = dsmr::settings::serial_settings(settings);
+    dsmr::reader::connect_to_meter(serial_settings.unwrap());
 }
