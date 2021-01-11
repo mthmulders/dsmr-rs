@@ -35,6 +35,7 @@ pub fn serial_settings(settings: config::Config) -> Result<SerialSettings, Strin
         .and_then(read_serial_settings)
 }
 
+#[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
     use super::*;
