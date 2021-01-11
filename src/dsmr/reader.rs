@@ -1,6 +1,5 @@
 use super::settings;
 
-use serialport;
 use std::borrow::Cow;
 use std::io::BufRead;
 use std::io::BufReader;
@@ -8,7 +7,7 @@ use std::str;
 use std::time::Duration;
 
 pub trait TelegramConsumer {
-    fn consume(&mut self, telegram: &str) -> ();
+    fn consume(&mut self, telegram: &str);
 }
 struct PrintConsumer {}
 impl PrintConsumer {
@@ -17,13 +16,13 @@ impl PrintConsumer {
     }
 }
 impl TelegramConsumer for PrintConsumer {
-    fn consume(&mut self, telegram: &str) -> () {
+    fn consume(&mut self, telegram: &str) {
         println!("Found telegram:\n{}", telegram)
     }
 }
 
 fn find_start_of_telegram(buffer: &str) -> Option<usize> {
-    buffer.find("/")
+    buffer.find('/')
 }
 
 fn find_end_of_telegram(buffer: &str, from: usize) -> Option<usize> {
