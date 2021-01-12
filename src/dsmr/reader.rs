@@ -90,10 +90,10 @@ fn eat_telegrams<'a>(buffer: &'a str, consumer: &mut dyn super::TelegramConsumer
     }
 }
 
-fn read_from_serial_port(port: &mut dyn serialport::SerialPort) {
+fn read_from_serial_port(port: &mut dyn serialport::SerialPort, consumer: &mut dyn super::TelegramConsumer) {
     let reader = &mut BufReader::new(port);
 
-    let mut consumer = PrintConsumer::new();
+    // let mut consumer = PrintConsumer::new();
 
     let mut buffer = String::new();
     loop {
@@ -101,7 +101,7 @@ fn read_from_serial_port(port: &mut dyn serialport::SerialPort) {
 
         let clone = buffer.clone();
 
-        let new_buffer = eat_telegrams(&clone, &mut consumer);
+        let new_buffer = eat_telegrams(&clone, consumer);
 
         if buffer != new_buffer {
             log::trace!("Replacing buffer {} with {}", buffer, new_buffer);
@@ -111,7 +111,7 @@ fn read_from_serial_port(port: &mut dyn serialport::SerialPort) {
     }
 }
 
-pub fn connect_to_meter(serial_settings: settings::SerialSettings) {
+pub fn connect_to_meter(serial_settings: settings::SerialSettings, consumer: &mut dyn super::TelegramConsumer) {
     log::info!(
         "Connecting to {} using baud rate {}",
         &serial_settings.port,
@@ -127,7 +127,7 @@ pub fn connect_to_meter(serial_settings: settings::SerialSettings) {
         .open()
         .expect("Failed to open port");
 
-    read_from_serial_port(&mut *port);
+    read_from_serial_port(&mut *port, consumer);
 }
 
 #[cfg(test)]

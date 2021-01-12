@@ -10,16 +10,16 @@ impl UploadConsumer {
     }
 }
 impl super::TelegramConsumer for UploadConsumer {
-    fn consume(&mut self, telegram: &str) {
+    fn consume(&mut self, _telegram: &str) {
         println!("About to upload telegram to {}", self.host);
     }
 }
 
-struct DelegatingConsumer {
+pub struct DelegatingConsumer {
     delegates: Vec<UploadConsumer>,
 }
 impl DelegatingConsumer {
-    fn new(targets: Vec<settings::Host>) -> Self {
+    pub fn new(targets: Vec<settings::Host>) -> Self {
 
         let delegates = (0..targets.len())
             .map(|index| UploadConsumer::new(&targets[index]))

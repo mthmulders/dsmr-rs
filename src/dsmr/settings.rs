@@ -15,7 +15,7 @@ pub struct HostSettings {
     pub hosts: Vec<Host>,
 }
 
-fn read_serial_settings(settings: HashMap<String, String>) -> Result<SerialSettings, String> {
+fn read_serial_settings(settings: &HashMap<String, String>) -> Result<SerialSettings, String> {
     let serial_port = match settings.get("serial_port") {
         Some(value) => value,
         None => return Err("Setting serial_port not defined".to_string()),
@@ -36,7 +36,7 @@ fn read_serial_settings(settings: HashMap<String, String>) -> Result<SerialSetti
     })
 }
 
-fn read_host_settings(settings: HashMap<String, String>) -> Result<HostSettings, String> {
+fn read_host_settings(settings: &HashMap<String, String>) -> Result<HostSettings, String> {
     let hosts: Vec<&str> = match settings.get("api_hosts") {
         Some(value) => value.split(',').collect(),
         None => return Err("Setting api_hosts not defined".to_string()),
@@ -65,20 +65,18 @@ fn read_host_settings(settings: HashMap<String, String>) -> Result<HostSettings,
     Ok(HostSettings { hosts: result })
 }
 
-pub fn serial_settings(settings: config::Config) -> Result<SerialSettings, String> {
-    log::trace!("reading serial settings...");
-    settings
-        .try_into::<HashMap<String, String>>()
-        .map_err(|e| e.to_string())
-        .and_then(read_serial_settings)
-}
+pub fn settings(settings: config::Config) -> Result<(SerialSettings, HostSettings), String> {
+    let config_map = settings.try_into::<HashMap<String, String>>().map_err(|e| e.to_string()).unwrap();
+    
+    let serial_settings = read_serial_settings(&config_map);
+    let host_settings = read_host_settings(&config_map);
 
-pub fn host_settings(settings: config::Config) -> Result<HostSettings, String> {
-    log::trace!("reading host settings...");
-    settings
-        .try_into::<HashMap<String, String>>()
-        .map_err(|e| e.to_string())
-        .and_then(read_host_settings)
+    match (serial_settings, host_settings) {
+        (Ok(s), Ok(h)) => Ok((s, h)),
+        (Ok(_), Err(msg)) => Err(msg),
+        (Err(msg), Ok(_)) => Err(msg),
+        (Err(msg1), Err(msg2)) => Err([msg1, msg2].join(" + "))
+    }
 }
 
 #[cfg(test)]
@@ -92,7 +90,7 @@ mod tests {
         settings.insert(String::from("serial_port"), String::from("/dev/ttyUSB0"));
         settings.insert(String::from("serial_baudrate"), String::from("9600"));
 
-        let result = read_serial_settings(settings);
+        let result = read_serial_settings(&settings);
 
         assert_eq!(result.is_ok(), true);
         let value = result.unwrap();
@@ -105,7 +103,7 @@ mod tests {
         let mut settings = HashMap::new();
         settings.insert(String::from("serial_baudrate"), String::from("9600"));
 
-        let result = read_serial_settings(settings);
+        let result = read_serial_settings(&settings);
 
         assert_eq!(result.is_err(), true);
     }
@@ -115,7 +113,7 @@ mod tests {
         let mut settings = HashMap::new();
         settings.insert(String::from("serial_port"), String::from("/dev/ttyUSB0"));
 
-        let result = read_serial_settings(settings);
+        let result = read_serial_settings(&settings);
 
         assert_eq!(result.is_err(), true);
     }
@@ -126,7 +124,7 @@ mod tests {
         settings.insert(String::from("serial_port"), String::from("/dev/ttyUSB0"));
         settings.insert(String::from("serial_baudrate"), String::from("a"));
 
-        let result = read_serial_settings(settings);
+        let result = read_serial_settings(&settings);
 
         assert_eq!(result.is_err(), true);
     }
@@ -137,7 +135,7 @@ mod tests {
         settings.insert(String::from("api_hosts"), String::from("localhost"));
         settings.insert(String::from("api_keys"), String::from("this-is-not-secret"));
 
-        let result = read_host_settings(settings);
+        let result = read_host_settings(&settings);
 
         assert_eq!(result.is_ok(), true);
         let value = result.unwrap();
@@ -151,7 +149,7 @@ mod tests {
         let mut settings = HashMap::new();
         settings.insert(String::from("api_hosts"), String::from("localhost"));
 
-        let result = read_host_settings(settings);
+        let result = read_host_settings(&settings);
 
         assert_eq!(result.is_ok(), false);
     }
@@ -161,7 +159,7 @@ mod tests {
         let mut settings = HashMap::new();
         settings.insert(String::from("api_hosts"), String::from("localhost"));
 
-        let result = read_host_settings(settings);
+        let result = read_host_settings(&settings);
 
         assert_eq!(result.is_ok(), false);
     }
@@ -178,7 +176,7 @@ mod tests {
             String::from("this-is-not-secret,this-better-be-secret"),
         );
 
-        let result = read_host_settings(settings);
+        let result = read_host_settings(&settings);
 
         assert_eq!(result.is_ok(), true);
         let value = result.unwrap();
@@ -198,7 +196,7 @@ mod tests {
         );
         settings.insert(String::from("api_keys"), String::from("this-is-not-secret"));
 
-        let result = read_host_settings(settings);
+        let result = read_host_settings(&settings);
 
         assert_eq!(result.is_ok(), false);
     }
