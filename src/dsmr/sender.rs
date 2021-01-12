@@ -1,5 +1,7 @@
 use super::settings;
 
+use std::collections::HashMap;
+
 struct UploadConsumer {
     host: String,
     key: String,
@@ -18,11 +20,15 @@ impl super::TelegramConsumer for UploadConsumer {
     fn consume(&mut self, telegram: &str) {
         log::trace!("- uploading telegram to {}", self.host);
         let url = [&self.host, "/api/v1/datalogger/dsmrreading"].join("");
+        
+        let mut params = HashMap::new();
+        params.insert("telegram", telegram.to_string());
+
         let result = self
             .client
             .post(&url)
             .header("Authorization", format!("Token {}", self.key))
-            .body(telegram.to_string())
+            .form(&params)
             .send();
 
         match result {
