@@ -11,7 +11,7 @@ impl UploadConsumer {
 }
 impl super::TelegramConsumer for UploadConsumer {
     fn consume(&mut self, _telegram: &str) {
-        println!("About to upload telegram to {}", self.host);
+        log::info!("- uploading telegram to {}", self.host);
     }
 }
 
@@ -30,7 +30,7 @@ impl DelegatingConsumer {
 }
 impl super::TelegramConsumer for DelegatingConsumer {
     fn consume(&mut self, telegram: &str) {
-        println!("About to upload telegram to {} hosts", self.delegates.len());
+        log::info!("Uploading telegram to {} hosts", self.delegates.len());
         for delegate in &mut self.delegates {
             delegate.consume(telegram);
         }
