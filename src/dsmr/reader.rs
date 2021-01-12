@@ -6,16 +6,13 @@ use std::io::BufReader;
 use std::str;
 use std::time::Duration;
 
-pub trait TelegramConsumer {
-    fn consume(&mut self, telegram: &str);
-}
 struct PrintConsumer {}
 impl PrintConsumer {
     fn new() -> Self {
         PrintConsumer {}
     }
 }
-impl TelegramConsumer for PrintConsumer {
+impl super::TelegramConsumer for PrintConsumer {
     fn consume(&mut self, telegram: &str) {
         println!("Found telegram:\n{}", telegram)
     }
@@ -57,7 +54,7 @@ fn find_end_of_telegram(buffer: &str, from: usize) -> Option<usize> {
 // Otherwise, clear the buffer (if there is no telegram unders construction)
 // or keep it intact (if a telegram is under construction).
 // Returns the new state of the buffer - which may be the unmodified buffer, or a new buffer.
-fn eat_telegrams<'a>(buffer: &'a str, consumer: &mut dyn TelegramConsumer) -> Cow<'a, str> {
+fn eat_telegrams<'a>(buffer: &'a str, consumer: &mut dyn super::TelegramConsumer) -> Cow<'a, str> {
     let start_index = find_start_of_telegram(buffer);
     let end_index = find_end_of_telegram(buffer, start_index.unwrap_or(0));
 
@@ -170,7 +167,7 @@ mod tests {
             }
         }
     }
-    impl TelegramConsumer for TestConsumer {
+    impl super::super::TelegramConsumer for TestConsumer {
         fn consume(&mut self, telegram: &str) -> () {
             self.invoked = true;
             self.telegram = String::from(telegram);
