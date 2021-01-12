@@ -20,7 +20,7 @@ impl super::TelegramConsumer for UploadConsumer {
     fn consume(&mut self, telegram: &str) {
         log::trace!("- uploading telegram to {}", self.host);
         let url = [&self.host, "/api/v1/datalogger/dsmrreading"].join("");
-        
+
         let mut params = HashMap::new();
         params.insert("telegram", telegram.to_string());
 
