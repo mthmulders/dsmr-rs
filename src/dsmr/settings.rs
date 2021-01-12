@@ -39,19 +39,28 @@ fn read_serial_settings(settings: HashMap<String, String>) -> Result<SerialSetti
 fn read_host_settings(settings: HashMap<String, String>) -> Result<HostSettings, String> {
     let hosts: Vec<&str> = match settings.get("api_hosts") {
         Some(value) => value.split(',').collect(),
-        None => return Err("Setting api_hosts not defined".to_string())
+        None => return Err("Setting api_hosts not defined".to_string()),
     };
     let keys: Vec<&str> = match settings.get("api_keys") {
         Some(value) => value.split(',').collect(),
-        None => return Err("Setting api_hosts not defined".to_string())
+        None => return Err("Setting api_hosts not defined".to_string()),
     };
 
     if hosts.len() != keys.len() {
-        let msg = format!("Number of items in api_hosts ({}) is not equal to number of items in api_keys ({})", hosts.len(), keys.len());
+        let msg = format!(
+            "Number of items in api_hosts ({}) is not equal to number of items in api_keys ({})",
+            hosts.len(),
+            keys.len()
+        );
         return Err(msg);
     }
 
-    let result = (0..hosts.len()).map(|x| Host { address: String::from(hosts[x]), key: String::from(keys[x]) }).collect::<Vec<Host>>();
+    let result = (0..hosts.len())
+        .map(|x| Host {
+            address: String::from(hosts[x]),
+            key: String::from(keys[x]),
+        })
+        .collect::<Vec<Host>>();
 
     Ok(HostSettings { hosts: result })
 }
@@ -147,7 +156,6 @@ mod tests {
         assert_eq!(result.is_ok(), false);
     }
 
-
     #[test]
     fn host_settings_no_api_keys() {
         let mut settings = HashMap::new();
@@ -161,8 +169,14 @@ mod tests {
     #[test]
     fn host_settings_multiple_pairs() {
         let mut settings = HashMap::new();
-        settings.insert(String::from("api_hosts"), String::from("localhost,remote-host"));
-        settings.insert(String::from("api_keys"), String::from("this-is-not-secret,this-better-be-secret"));
+        settings.insert(
+            String::from("api_hosts"),
+            String::from("localhost,remote-host"),
+        );
+        settings.insert(
+            String::from("api_keys"),
+            String::from("this-is-not-secret,this-better-be-secret"),
+        );
 
         let result = read_host_settings(settings);
 
@@ -178,7 +192,10 @@ mod tests {
     #[test]
     fn host_settings_number_elements_mismatch() {
         let mut settings = HashMap::new();
-        settings.insert(String::from("api_hosts"), String::from("localhost,remote-host"));
+        settings.insert(
+            String::from("api_hosts"),
+            String::from("localhost,remote-host"),
+        );
         settings.insert(String::from("api_keys"), String::from("this-is-not-secret"));
 
         let result = read_host_settings(settings);
