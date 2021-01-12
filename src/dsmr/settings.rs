@@ -66,8 +66,11 @@ fn read_host_settings(settings: &HashMap<String, String>) -> Result<HostSettings
 }
 
 pub fn settings(settings: config::Config) -> Result<(SerialSettings, HostSettings), String> {
-    let config_map = settings.try_into::<HashMap<String, String>>().map_err(|e| e.to_string()).unwrap();
-    
+    let config_map = settings
+        .try_into::<HashMap<String, String>>()
+        .map_err(|e| e.to_string())
+        .unwrap();
+
     let serial_settings = read_serial_settings(&config_map);
     let host_settings = read_host_settings(&config_map);
 
@@ -75,7 +78,7 @@ pub fn settings(settings: config::Config) -> Result<(SerialSettings, HostSetting
         (Ok(s), Ok(h)) => Ok((s, h)),
         (Ok(_), Err(msg)) => Err(msg),
         (Err(msg), Ok(_)) => Err(msg),
-        (Err(msg1), Err(msg2)) => Err([msg1, msg2].join(" + "))
+        (Err(msg1), Err(msg2)) => Err([msg1, msg2].join(" + ")),
     }
 }
 

@@ -90,7 +90,10 @@ fn eat_telegrams<'a>(buffer: &'a str, consumer: &mut dyn super::TelegramConsumer
     }
 }
 
-fn read_from_serial_port(port: &mut dyn serialport::SerialPort, consumer: &mut dyn super::TelegramConsumer) {
+fn read_from_serial_port(
+    port: &mut dyn serialport::SerialPort,
+    consumer: &mut dyn super::TelegramConsumer,
+) {
     let reader = &mut BufReader::new(port);
 
     // let mut consumer = PrintConsumer::new();
@@ -111,7 +114,10 @@ fn read_from_serial_port(port: &mut dyn serialport::SerialPort, consumer: &mut d
     }
 }
 
-pub fn connect_to_meter(serial_settings: settings::SerialSettings, consumer: &mut dyn super::TelegramConsumer) {
+pub fn connect_to_meter(
+    serial_settings: settings::SerialSettings,
+    consumer: &mut dyn super::TelegramConsumer,
+) {
     log::info!(
         "Connecting to {} using baud rate {}",
         &serial_settings.port,

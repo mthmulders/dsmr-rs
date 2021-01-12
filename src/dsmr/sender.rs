@@ -10,14 +10,16 @@ impl UploadConsumer {
         UploadConsumer {
             client: reqwest::blocking::Client::new(),
             host: String::from(&target.address),
-            key: String::from(&target.key)
+            key: String::from(&target.key),
         }
     }
 }
 impl super::TelegramConsumer for UploadConsumer {
     fn consume(&mut self, telegram: &str) {
         log::trace!("- uploading telegram to {}", self.host);
-        let result = self.client.post(&self.host)
+        let result = self
+            .client
+            .post(&self.host)
             .header("Authorization", format!("Token {}", self.key))
             .body(telegram.to_string())
             .send();
@@ -34,12 +36,13 @@ pub struct DelegatingConsumer {
 }
 impl DelegatingConsumer {
     pub fn new(targets: Vec<settings::Host>) -> Self {
-
         let delegates = (0..targets.len())
             .map(|index| UploadConsumer::new(&targets[index]))
             .collect::<Vec<UploadConsumer>>();
 
-        DelegatingConsumer { delegates: delegates }
+        DelegatingConsumer {
+            delegates: delegates,
+        }
     }
 }
 impl super::TelegramConsumer for DelegatingConsumer {
