@@ -47,9 +47,7 @@ impl DelegatingConsumer {
             .map(|index| UploadConsumer::new(&targets[index]))
             .collect::<Vec<UploadConsumer>>();
 
-        DelegatingConsumer {
-            delegates: delegates,
-        }
+        DelegatingConsumer { delegates }
     }
 }
 impl super::TelegramConsumer for DelegatingConsumer {
