@@ -3,15 +3,29 @@ use super::settings;
 struct UploadConsumer {
     host: String,
     key: String,
+    client: reqwest::blocking::Client,
 }
 impl UploadConsumer {
     fn new(target: &settings::Host) -> Self {
-        UploadConsumer { host: String::from(&target.address), key: String::from(&target.key) }
+        UploadConsumer {
+            client: reqwest::blocking::Client::new(),
+            host: String::from(&target.address),
+            key: String::from(&target.key)
+        }
     }
 }
 impl super::TelegramConsumer for UploadConsumer {
-    fn consume(&mut self, _telegram: &str) {
-        log::info!("- uploading telegram to {}", self.host);
+    fn consume(&mut self, telegram: &str) {
+        log::trace!("- uploading telegram to {}", self.host);
+        let result = self.client.post(&self.host)
+            .header("Authorization", format!("Token {}", self.key))
+            .body(telegram.to_string())
+            .send();
+
+        match result {
+            Ok(response) => log::trace!("Got response with status {}", response.status()),
+            Err(msg) => log::warn!("Could not upload telegram due to {}", msg),
+        }
     }
 }
 
