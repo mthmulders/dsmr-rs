@@ -230,9 +230,8 @@ mod tests {
 
     #[test]
     fn eat_telegrams_without_checksum_start_and_end() {
-        let mut text = String::from(
-            "/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)\r\n!\r\n\r\n/ISk5\\2MT382-1000",
-        );
+        let mut text =
+            String::from("/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)\r\n!\r\n\r\n/ISk5\\2MT382-1000");
         let mut consumer = TestConsumer::new();
 
         let result = eat_telegrams(&mut text, &mut consumer);

@@ -25,13 +25,11 @@ fn init_logger(debug_logging: bool) {
         ])
         .unwrap()
     } else {
-        simplelog::CombinedLogger::init(vec![
-            simplelog::TermLogger::new(
-                console_level,
-                config.clone(),
-                simplelog::TerminalMode::Mixed,
-            ),
-        ])
+        simplelog::CombinedLogger::init(vec![simplelog::TermLogger::new(
+            console_level,
+            config.clone(),
+            simplelog::TerminalMode::Mixed,
+        )])
         .unwrap()
     }
 }
