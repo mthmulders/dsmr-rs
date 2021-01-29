@@ -27,11 +27,11 @@ fn find_end_of_telegram(buffer: &str, from: usize) -> Option<usize> {
     match buffer[from..].find('!') {
         Some(excl_mark) => {
             // Not all meters send the checksum; some simply have a last line with just '!'
-            match buffer[excl_mark..].find('\n') {
+            match buffer[(excl_mark + 1)..].find('\n') {
                 Some(line_end) => {
-                    let end = excl_mark + line_end;
+                    let end = excl_mark + line_end + 1;
                     log::trace!(
-                        "Exclamation mark found at index {}, returning index {}",
+                        "Exclamation mark with line ending found at index {}, returning index {}",
                         excl_mark,
                         end
                     );
@@ -190,6 +190,14 @@ mod tests {
 
         assert_eq!(result, text);
         assert_eq!(consumer.invoked, false);
+
+        let text = String::from("/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)!");
+        let mut consumer = TestConsumer::new();
+
+        let result = eat_telegrams(&text, &mut consumer);
+
+        assert_eq!(result, text);
+        assert_eq!(consumer.invoked, false);
     }
 
     #[test]
@@ -216,6 +224,23 @@ mod tests {
         assert_eq!(
             consumer.telegram,
             "/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)\r\n!522B\r\n"
+        );
+        assert_eq!(result, "\r\n/ISk5\\2MT382-1000");
+    }
+
+    #[test]
+    fn eat_telegrams_without_checksum_start_and_end() {
+        let mut text = String::from(
+            "/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)\r\n!\r\n\r\n/ISk5\\2MT382-1000",
+        );
+        let mut consumer = TestConsumer::new();
+
+        let result = eat_telegrams(&mut text, &mut consumer);
+
+        assert_eq!(consumer.invoked, true);
+        assert_eq!(
+            consumer.telegram,
+            "/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)\r\n!\r\n"
         );
         assert_eq!(result, "\r\n/ISk5\\2MT382-1000");
     }
