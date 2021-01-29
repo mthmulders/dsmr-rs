@@ -4,6 +4,10 @@
 
 A utility tool to ship data from a smart energy meter over HTTP.
 
+## Running
+Copy the sample [SupervisorD configuration](./sample-supervisord-config) to **/etc/supervisor/conf.d**.
+Issue `sudo supervisorctl reload` followed by `sudo supervisorctl start dsmr_native_logger`.
+
 ## Development
 
 ### Testing

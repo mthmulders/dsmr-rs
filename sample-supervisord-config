@@ -1,0 +1,17 @@
+[program:dsmr_native_logger]
+directory=/home/dsmr
+command=/home/dsmr/dsmr-rs
+pidfile=/var/tmp/dsmr-rs--%(program_name)s.pid
+environment=DATALOGGER_API_HOSTS=https://my.host.name,DATALOGGER_SERIAL_PORT=/dev/ttyUSB0,DATALOGGER_API_KEYS=something-secret,DATALOGGER_INPUT_METHOD=serial,DATALOGGER_SERIAL_BAUDRATE=9600
+user=dsmr
+group=dsmr
+autostart=true
+autorestart=true
+startsecs=1
+startretries=100
+stopwaitsecs=20
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/%(program_name)s.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=3
+
