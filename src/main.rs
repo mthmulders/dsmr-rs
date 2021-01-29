@@ -1,7 +1,6 @@
 mod dsmr;
 
 fn init_logger(debug_logging: bool) {
-    let file = std::fs::File::create("dsmr-rs.log").unwrap();
     let console_level = if debug_logging {
         simplelog::LevelFilter::Debug
     } else {
@@ -14,15 +13,27 @@ fn init_logger(debug_logging: bool) {
     };
     let config = simplelog::Config::default();
 
-    simplelog::CombinedLogger::init(vec![
-        simplelog::TermLogger::new(
-            console_level,
-            config.clone(),
-            simplelog::TerminalMode::Mixed,
-        ),
-        simplelog::WriteLogger::new(file_level, config, file),
-    ])
-    .unwrap()
+    if debug_logging {
+        let file = std::fs::File::create("dsmr-rs.log").unwrap();
+        simplelog::CombinedLogger::init(vec![
+            simplelog::TermLogger::new(
+                console_level,
+                config.clone(),
+                simplelog::TerminalMode::Mixed,
+            ),
+            simplelog::WriteLogger::new(file_level, config, file),
+        ])
+        .unwrap()
+    } else {
+        simplelog::CombinedLogger::init(vec![
+            simplelog::TermLogger::new(
+                console_level,
+                config.clone(),
+                simplelog::TerminalMode::Mixed,
+            ),
+        ])
+        .unwrap()
+    }
 }
 
 pub fn main() {
