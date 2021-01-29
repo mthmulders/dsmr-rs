@@ -27,7 +27,7 @@ fn init_logger(debug_logging: bool) {
     } else {
         simplelog::CombinedLogger::init(vec![simplelog::TermLogger::new(
             console_level,
-            config.clone(),
+            config,
             simplelog::TerminalMode::Mixed,
         )])
         .unwrap()
