@@ -6,17 +6,18 @@ use std::io::BufReader;
 use std::str;
 use std::time::Duration;
 
-struct PrintConsumer {}
-impl PrintConsumer {
-    fn new() -> Self {
-        PrintConsumer {}
-    }
-}
-impl super::TelegramConsumer for PrintConsumer {
-    fn consume(&mut self, telegram: &str) {
-        println!("Found telegram:\n{}", telegram)
-    }
-}
+// For troubleshooting purposes...
+// struct PrintConsumer {}
+// impl PrintConsumer {
+//     fn new() -> Self {
+//         PrintConsumer {}
+//     }
+// }
+// impl super::TelegramConsumer for PrintConsumer {
+//     fn consume(&mut self, telegram: &str) {
+//         println!("Found telegram:\n{}", telegram)
+//     }
+// }
 
 fn find_start_of_telegram(buffer: &str) -> Option<usize> {
     buffer.find('/')
@@ -26,11 +27,11 @@ fn find_end_of_telegram(buffer: &str, from: usize) -> Option<usize> {
     match buffer[from..].find('!') {
         Some(excl_mark) => {
             // Not all meters send the checksum; some simply have a last line with just '!'
-            match buffer[excl_mark..].find('\n') {
+            match buffer[(excl_mark + 1)..].find('\n') {
                 Some(line_end) => {
-                    let end = excl_mark + line_end;
+                    let end = excl_mark + line_end + 1;
                     log::trace!(
-                        "Exclamation mark found at index {}, returning index {}",
+                        "Exclamation mark with line ending found at index {}, returning index {}",
                         excl_mark,
                         end
                     );
@@ -90,10 +91,13 @@ fn eat_telegrams<'a>(buffer: &'a str, consumer: &mut dyn super::TelegramConsumer
     }
 }
 
-fn read_from_serial_port(port: &mut dyn serialport::SerialPort) {
+fn read_from_serial_port(
+    port: &mut dyn serialport::SerialPort,
+    consumer: &mut dyn super::TelegramConsumer,
+) {
     let reader = &mut BufReader::new(port);
 
-    let mut consumer = PrintConsumer::new();
+    // let mut consumer = PrintConsumer::new();
 
     let mut buffer = String::new();
     loop {
@@ -101,7 +105,7 @@ fn read_from_serial_port(port: &mut dyn serialport::SerialPort) {
 
         let clone = buffer.clone();
 
-        let new_buffer = eat_telegrams(&clone, &mut consumer);
+        let new_buffer = eat_telegrams(&clone, consumer);
 
         if buffer != new_buffer {
             log::trace!("Replacing buffer {} with {}", buffer, new_buffer);
@@ -111,7 +115,10 @@ fn read_from_serial_port(port: &mut dyn serialport::SerialPort) {
     }
 }
 
-pub fn connect_to_meter(serial_settings: settings::SerialSettings) {
+pub fn connect_to_meter(
+    serial_settings: settings::SerialSettings,
+    consumer: &mut dyn super::TelegramConsumer,
+) {
     log::info!(
         "Connecting to {} using baud rate {}",
         &serial_settings.port,
@@ -127,7 +134,7 @@ pub fn connect_to_meter(serial_settings: settings::SerialSettings) {
         .open()
         .expect("Failed to open port");
 
-    read_from_serial_port(&mut *port);
+    read_from_serial_port(&mut *port, consumer);
 }
 
 #[cfg(test)]
@@ -183,6 +190,14 @@ mod tests {
 
         assert_eq!(result, text);
         assert_eq!(consumer.invoked, false);
+
+        let text = String::from("/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)!");
+        let mut consumer = TestConsumer::new();
+
+        let result = eat_telegrams(&text, &mut consumer);
+
+        assert_eq!(result, text);
+        assert_eq!(consumer.invoked, false);
     }
 
     #[test]
@@ -209,6 +224,23 @@ mod tests {
         assert_eq!(
             consumer.telegram,
             "/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)\r\n!522B\r\n"
+        );
+        assert_eq!(result, "\r\n/ISk5\\2MT382-1000");
+    }
+
+    #[test]
+    fn eat_telegrams_without_checksum_start_and_end() {
+        let mut text = String::from(
+            "/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)\r\n!\r\n\r\n/ISk5\\2MT382-1000",
+        );
+        let mut consumer = TestConsumer::new();
+
+        let result = eat_telegrams(&mut text, &mut consumer);
+
+        assert_eq!(consumer.invoked, true);
+        assert_eq!(
+            consumer.telegram,
+            "/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)\r\n!\r\n"
         );
         assert_eq!(result, "\r\n/ISk5\\2MT382-1000");
     }
