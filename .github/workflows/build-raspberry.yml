@@ -13,6 +13,11 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
+      - name: Whatever
+        uses: numworks/setup-arm-toolchain@2020-q4
+        run: |
+          cargo build --target armv7-unknown-linux-gnueabihf --release --features ""
+
       - name: Download ARM Toolchain
         run: |
           pushd /tmp
