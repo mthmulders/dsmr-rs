@@ -13,8 +13,12 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v2
 
-      - name: Setup ARM Toolchain
-        uses: numworks/setup-arm-toolchain@2020-q4
+      - name: Download ARM Toolchain
+        run: |
+          pushd /tmp
+          wget -q "https://developer.arm.com/-/media/Files/downloads/gnu-a/10.2-2020.11/binrel/gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf.tar.xz?revision=d0b90559-3960-4e4b-9297-7ddbc3e52783&la=en&hash=985078B758BC782BC338DB947347107FBCF8EF6B" \
+            -O gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf.tar.xz
+          tar xf gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf.tar.xz
         
       - name: Install Standard Rust library for Raspberry Pi 2/3/4
         run: |
@@ -30,28 +34,6 @@ jobs:
         with:
           arch: armhf
           packages: "libssl-dev:armhf libudev-dev:armhf"
-
-      - name: Perform build
-        run: |
-          cargo build --target armv7-unknown-linux-gnueabihf --release --features ""
-        env:
-          PKG_CONFIG: "/usr/bin/arm-linux-gnueabihf-pkg-config"
-
-      - name: Download ARM Toolchain
-        run: |
-          pushd /tmp
-          wget -q "https://developer.arm.com/-/media/Files/downloads/gnu-a/10.2-2020.11/binrel/gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf.tar.xz?revision=d0b90559-3960-4e4b-9297-7ddbc3e52783&la=en&hash=985078B758BC782BC338DB947347107FBCF8EF6B" \
-            -O gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf.tar.xz
-          tar xf gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf.tar.xz
-
-      - name: Install build dependencies
-        run: |
-          sudo dpkg --add-architecture armhf
-          # sudo echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal main" > /etc/apt/sources.list.d/ubuntu-ports.list
-          # sudo echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-security main" > /etc/apt/sources.list.d/ubuntu-ports.list
-          # sudo echo "deb [arch=armhf] http://ports.ubuntu.com/ubuntu-ports focal-updates main" > /etc/apt/sources.list.d/ubuntu-ports.list
-          sudo apt-get update
-          sudo apt-get install pkg-config-arm-linux-gnueabihf libssl-dev:armhf libudev-dev:armhf
 
       - name: Perform build
         run: |
