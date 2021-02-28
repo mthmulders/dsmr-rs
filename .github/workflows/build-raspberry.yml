@@ -26,7 +26,7 @@ jobs:
           sudo apt-get install pkg-config-arm-linux-gnueabihf
 
       - name: Install armhf build dependencies
-        uses: ryankurte/action-apt@v0.1
+        uses: ryankurte/action-apt@v0.3.0
         with:
           arch: armhf
           packages: "libssl-dev:armhf libudev-dev:armhf"
