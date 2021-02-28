@@ -19,10 +19,6 @@ jobs:
           wget -q "https://developer.arm.com/-/media/Files/downloads/gnu-a/10.2-2020.11/binrel/gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf.tar.xz?revision=d0b90559-3960-4e4b-9297-7ddbc3e52783&la=en&hash=985078B758BC782BC338DB947347107FBCF8EF6B" \
             -O gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf.tar.xz
           tar xf gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf.tar.xz
-        
-      - name: Install Standard Rust library for Raspberry Pi 2/3/4
-        run: |
-          rustup target add armv7-unknown-linux-gnueabihf
 
       - name: Install cross-build dependencies
         run: |
