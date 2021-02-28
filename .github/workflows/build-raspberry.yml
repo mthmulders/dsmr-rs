@@ -34,6 +34,8 @@ jobs:
       - name: Perform build
         run: |
           cargo build --target armv7-unknown-linux-gnueabihf --release --features ""
+        env:
+          PKG_CONFIG: "/usr/bin/arm-linux-gnueabihf-pkg-config"
 
       - name: Download ARM Toolchain
         run: |
