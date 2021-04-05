@@ -20,6 +20,7 @@ fn init_logger(debug_logging: bool) {
                 console_level,
                 config.clone(),
                 simplelog::TerminalMode::Mixed,
+                simplelog::ColorChoice::Never,
             ),
             simplelog::WriteLogger::new(file_level, config, file),
         ])
@@ -29,6 +30,7 @@ fn init_logger(debug_logging: bool) {
             console_level,
             config,
             simplelog::TerminalMode::Mixed,
+            simplelog::ColorChoice::Never,
         )])
         .unwrap()
     }
