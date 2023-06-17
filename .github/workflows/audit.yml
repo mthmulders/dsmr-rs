@@ -13,7 +13,14 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install build requirements
+        run: |
+          sudo apt update -y
+          sudo apt install -y libssl-dev
+
       - uses: actions-rs/audit-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

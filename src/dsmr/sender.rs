@@ -26,7 +26,7 @@ impl super::TelegramConsumer for UploadConsumer {
 
         let result = self
             .client
-            .post(&url)
+            .post(url)
             .header("Authorization", format!("Token {}", self.key))
             .form(&params)
             .send();
