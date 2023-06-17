@@ -21,3 +21,9 @@ features = [ "blocking" ]
 
 [dependencies.openssl]
 version = "0.10.54"
+# Build OpenSSL as part of building this crate
+features = [ "vendored" ]
+
+# Ensure we select OpenSSL 3.x
+[dependencies.openssl-src]
+version = "300.1.2+3.1.1"
