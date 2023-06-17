@@ -38,7 +38,7 @@ jobs:
           ARMHF_TOOLCHAIN_PATH: "/tmp/gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf/"
       
       - name: Upload application
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: github.ref == 'refs/heads/main'
         with:
           name: dsmr-rs
