@@ -7,7 +7,6 @@ on:
     paths:
       - '**/Cargo.toml'
       - '**/Cargo.lock'
-  pull_request:
 
 jobs:
   audit:
@@ -21,6 +20,7 @@ jobs:
           sudo apt update -y
           sudo apt install -y libssl-dev
 
-      - uses: actions-rs/audit-check@v1
+      - name: Run cargo audit
+        uses: actions-rs/audit-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
