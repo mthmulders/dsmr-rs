@@ -37,12 +37,11 @@ fn init_logger(debug_logging: bool) {
 }
 
 pub fn main() {
-    let mut settings = config::Config::default();
-    settings
+    let builder = config::Config::builder()
         // Add in settings from the environment (with a prefix of APP)
         // Eg.. `DATALOGGER_DEBUG_LOGGING=1 dsmr-rs` would set the `debug_logging` key
-        .merge(config::Environment::with_prefix("DATALOGGER"))
-        .unwrap();
+        .add_source(config::Environment::with_prefix("DATALOGGER"));
+    let settings = builder.build().unwrap();
 
     let debug_logging = settings.get_bool("debug_logging").unwrap_or(false);
     init_logger(debug_logging);

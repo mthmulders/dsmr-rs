@@ -67,7 +67,7 @@ fn read_host_settings(settings: &HashMap<String, String>) -> Result<HostSettings
 
 pub fn settings(settings: config::Config) -> Result<(SerialSettings, HostSettings), String> {
     let config_map = settings
-        .try_into::<HashMap<String, String>>()
+        .try_deserialize::<HashMap<String, String>>()
         .map_err(|e| e.to_string())
         .unwrap();
 
