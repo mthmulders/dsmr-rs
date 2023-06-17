@@ -21,3 +21,4 @@ features = [ "blocking" ]
 
 [dependencies.openssl]
 version = "0.10.54"
+features = ["vendored"]
