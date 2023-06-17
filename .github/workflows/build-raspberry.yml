@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   build:
@@ -23,7 +25,7 @@ jobs:
       - name: Install cross-build dependencies
         run: |
           sudo apt update -y
-          sudo apt install -y pkg-config-arm-linux-gnueabihf gcc-arm-linux-gnueabihf
+          sudo apt install -y gcc-arm-linux-gnueabihf
 
       - name: Install armhf build dependencies
         uses: ryankurte/action-apt@v0.3.0
