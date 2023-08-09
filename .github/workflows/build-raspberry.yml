@@ -35,7 +35,7 @@ jobs:
 
       - name: Perform build
         run: |
-          ./cross-compile-armv7.sh
+          ./cross-compile-arm.sh
         env:
           ARMHF_TOOLCHAIN_PATH: "/tmp/gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf/"
       

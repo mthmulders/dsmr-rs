@@ -7,3 +7,7 @@ linker = "arm-linux-gnueabihf-gcc"
 # Pi 2/3/4
 [target.armv7-unknown-linux-gnueabihf]
 linker = "arm-none-linux-gnueabihf-gcc"
+
+# Raspberry Pi (statically linked against MUSL) 
+[target.arm-unknown-linux-musleabihf]
+linker = "arm-linux-gnueabihf-ld"
