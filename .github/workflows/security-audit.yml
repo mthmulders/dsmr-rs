@@ -9,8 +9,12 @@ on:
       - '**/Cargo.lock'
 
 jobs:
-  audit:
+  security-audit:
     runs-on: ubuntu-latest
+    permissions:
+      checks: write  # for rustsec/audit-check to create check
+      contents: read  # for actions/checkout to fetch code
+      issues: write  # for rustsec/audit-check to create issues
     steps:
       - name: Checkout sources
         uses: actions/checkout@v3.5.3
@@ -20,7 +24,7 @@ jobs:
           sudo apt update -y
           sudo apt install -y libssl-dev
 
-      - name: Run cargo audit
-        uses: actions-rs/audit-check@v1.2.0
+      - name: Audit Check
+        uses: rustsec/audit-check@v1.4.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
