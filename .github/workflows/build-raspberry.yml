@@ -28,7 +28,7 @@ jobs:
           sudo apt install -y gcc-arm-linux-gnueabihf
 
       - name: Install armhf build dependencies
-        uses: ryankurte/action-apt@v0.3.0
+        uses: ryankurte/action-apt@cec786efbd7f7a1402b78f489bcdcf9acba6e825
         with:
           arch: armhf
           packages: "libssl-dev:armhf libudev-dev:armhf"
