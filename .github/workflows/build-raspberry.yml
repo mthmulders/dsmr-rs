@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.5.3
 
       - name: Download ARM Toolchain
         run: |
@@ -40,7 +40,7 @@ jobs:
           ARMHF_TOOLCHAIN_PATH: "/tmp/gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf/"
       
       - name: Upload application
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.2
         if: github.ref == 'refs/heads/main'
         with:
           name: dsmr-rs
