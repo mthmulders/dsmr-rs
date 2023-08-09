@@ -18,9 +18,9 @@ jobs:
       - name: Download ARM Toolchain
         run: |
           pushd /tmp
-          wget -q "https://developer.arm.com/-/media/Files/downloads/gnu-a/10.2-2020.11/binrel/gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf.tar.xz?revision=d0b90559-3960-4e4b-9297-7ddbc3e52783&la=en&hash=985078B758BC782BC338DB947347107FBCF8EF6B" \
-            -O gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf.tar.xz
-          tar xf gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf.tar.xz
+          wget -q "https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf.tar.xz?rev=302e8e98351048d18b6f5b45d472f406&hash=B981F1567677321994BE1231441CB60C7274BB3D" \
+            -O gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf.tar.xz
+          tar xf gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf.tar.xz
 
       - name: Install cross-build dependencies
         run: |
@@ -37,7 +37,7 @@ jobs:
         run: |
           ./cross-compile-armv7.sh
         env:
-          ARMHF_TOOLCHAIN_PATH: "/tmp/gcc-arm-10.2-2020.11-x86_64-arm-none-linux-gnueabihf/"
+          ARMHF_TOOLCHAIN_PATH: "/tmp/gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf/"
       
       - name: Upload application
         uses: actions/upload-artifact@v3
