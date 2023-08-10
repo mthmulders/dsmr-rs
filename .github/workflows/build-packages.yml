@@ -16,8 +16,18 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v3.5.3
 
-      - name: Preserve built binaries
-        uses: swatinem/rust-cache@v2.6.0
+      - name: Set up Cargo cache
+        uses: actions/cache@v3.3.1
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/            
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
 
       - name: Install cross-compilation tools
         uses: taiki-e/setup-cross-toolchain-action@v1.15.0
@@ -37,8 +47,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Re-use pre-built binaries
-        uses: swatinem/rust-cache@v2.6.0
+      - name: Set up Cargo cache
+        uses: actions/cache@v3.3.1
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/            
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
 
       - name: Display structure of downloaded files
         run: find target/
