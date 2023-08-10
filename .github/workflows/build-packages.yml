@@ -83,5 +83,5 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         if: github.ref == 'refs/heads/main'
         with:
-          name: binaries
-          path: target/debian/
+          name: packages
+          path: target/arm-unknown-linux-musleabihf/debian/
