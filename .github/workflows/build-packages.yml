@@ -23,7 +23,7 @@ jobs:
 
       - name: Perform build
         run: |
-          cargo build --target arm-unknown-linux-musleabihf --release --features "" --strip
+          cargo build --target arm-unknown-linux-musleabihf --release --features ""
       
       - name: Upload application
         uses: actions/upload-artifact@v3.1.2
