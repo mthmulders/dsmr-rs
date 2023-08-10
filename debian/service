@@ -1,0 +1,9 @@
+[Unit]
+Description=dsmr-rs
+
+[Service]
+EnvironmentFile=/etc/dsmr-rs.conf
+ExecStart=/usr/bin/dsmr-rs
+
+[Install]
+WantedBy=multi-user.target

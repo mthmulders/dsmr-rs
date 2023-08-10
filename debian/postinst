@@ -1,0 +1,49 @@
+# Inspired by https://github.com/NLnetLabs/krill/blob/main/pkg/debian/postinst
+
+#!/bin/sh
+set -e
+
+PKG_CONF="/etc/dsmr-rs.conf"
+PKG_CONF_PERMS=640
+PKG_USER="dsmr-rs"
+
+create_user() {
+    if id ${PKG_USER} > /dev/null 2>&1; then return; fi
+    adduser --system --no-create-home --group ${PKG_USER}
+}
+
+create_configuration() {
+    if [ ! -f "${PKG_CONF}" ]; then
+        cat <<EOF > ${PKG_CONF}
+# The DSMR-reader API to forward telegrams to
+DATALOGGER_API_HOSTS=https://my.host.name
+
+# The serial port to read telegrams from
+DATALOGGER_SERIAL_PORT=/dev/ttyUSB0
+
+# The API key to authenticate against the DSMR-reader API
+DATALOGGER_API_KEYS=something-secret
+
+# The input method for reading telegrams. Expected to always be 'serial', so effectively ignored.
+DATALOGGER_INPUT_METHOD=serial
+
+# Baudrate for reading telegrams from the serial line.
+DATALOGGER_SERIAL_BAUDRATE=9600
+
+EOF
+        # Ensure that the config file has the correct ownership
+        chown ${PKG_USER}:${PKG_USER} ${PKG_CONF}
+        
+        # Ensure that the config file has the correct permissions
+        chmod ${PKG_CONF_PERMS} ${PKG_CONF}
+    fi
+}
+
+case "$1" in
+configure)
+    create_user
+    create_configuration
+    ;;
+esac
+
+#DEBHELPER#

@@ -1,0 +1,87 @@
+name: Build Debian packages for Raspberry Pi
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Consider creating a matrix to also include armv7-unknown-linux-musleabihf
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3.5.3
+
+      - name: Set up Cargo cache
+        uses: actions/cache@v3.3.1
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/            
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Install cross-compilation tools
+        uses: taiki-e/setup-cross-toolchain-action@v1.15.0
+        with:
+          target: arm-unknown-linux-musleabihf
+
+      - name: Perform build
+        run: |
+          cargo build --target arm-unknown-linux-musleabihf --release --features ""
+
+  package:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3.5.3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Cargo cache
+        uses: actions/cache@v3.3.1
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/            
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Inspect downloaded binaries
+        run: |
+          file target/arm-unknown-linux-musleabihf/release/dsmr-rs
+
+      - name: Prepare packaging
+        run: |
+          sudo apt update -y
+          sudo apt install -y dpkg dpkg-dev liblzma-dev libssl-dev
+          cargo install cargo-deb
+          rustup target add arm-unknown-linux-musleabihf
+
+      - name: Create Debian package
+        run: |
+          cargo deb --target arm-unknown-linux-musleabihf --no-build --no-strip -v
+
+      - name: Inspect generated packages
+        run: |
+          find target/ -name "*.deb" -exec file {} \;
+      
+      - name: Upload Debian packages
+        uses: actions/upload-artifact@v3.1.2
+        if: github.ref == 'refs/heads/main'
+        with:
+          name: binaries
+          path: target/debian/
