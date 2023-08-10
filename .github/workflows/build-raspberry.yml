@@ -23,10 +23,6 @@ jobs:
       - name: Perform build
         run: |
           cargo build --target arm-unknown-linux-musleabihf --release --features ""
-
-      - name: Verify
-        run: |
-          file target/arm-unknown-linux-musleabihf/release/dsmr-rs
       
       - name: Upload application
         uses: actions/upload-artifact@v3.1.2
