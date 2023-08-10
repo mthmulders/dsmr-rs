@@ -16,6 +16,9 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v3.5.3
 
+      - name: Preserve built binaries
+        uses: swatinem/rust-cache@v2.6.0
+
       - name: Install cross-compilation tools
         uses: taiki-e/setup-cross-toolchain-action@v1.15.0
         with:
@@ -24,12 +27,6 @@ jobs:
       - name: Perform build
         run: |
           cargo build --target arm-unknown-linux-musleabihf --release --features ""
-      
-      - name: Upload application
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: binaries
-          path: target/arm-unknown-linux-musleabihf/release/dsmr-rs
 
   package:
     runs-on: ubuntu-latest
@@ -40,18 +37,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download pre-built binaries
-        uses: actions/download-artifact@v3.0.2
-        with:
-          name: binaries
-          path: target/arm-unknown-linux-musleabihf/release/
+      - name: Re-use pre-built binaries
+        uses: swatinem/rust-cache@v2.6.0
 
       - name: Display structure of downloaded files
         run: find target/
 
       - name: Prepare packaging
         run: |
-          rustup target add arm-unknown-linux-musleabihf
+          sudo apt update -y
+          sudo apt install -y dpkg dpkg-dev liblzma-dev libssl-dev
           cargo install cargo-deb
 
       - name: Create Debian package
