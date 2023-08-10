@@ -10,6 +10,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Consider creating a matrix to also include armv7-unknown-linux-musleabihf
 
     steps:
       - name: Checkout sources
@@ -19,7 +20,6 @@ jobs:
         uses: taiki-e/setup-cross-toolchain-action@v1.15.0
         with:
           target: arm-unknown-linux-musleabihf
-          # alternatively, also include armv7-unknown-linux-musleabihf
 
       - name: Perform build
         run: |
@@ -51,6 +51,7 @@ jobs:
 
       - name: Create Debian package
         run: |
+          rustup target add arm-unknown-linux-musleabihf
           cargo install cargo-deb
           cargo deb --target arm-unknown-linux-musleabihf --strip
 
