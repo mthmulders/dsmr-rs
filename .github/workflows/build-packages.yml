@@ -49,10 +49,13 @@ jobs:
       - name: Display structure of downloaded files
         run: find target/
 
-      - name: Create Debian package
+      - name: Prepare packaging
         run: |
           rustup target add arm-unknown-linux-musleabihf
           cargo install cargo-deb
+
+      - name: Create Debian package
+        run: |
           cargo deb --target arm-unknown-linux-musleabihf --strip
 
       - name: Display structure of package directory 
