@@ -5,8 +5,10 @@
 A utility tool to ship data from a smart energy meter over HTTP.
 
 ## Running
-Copy the sample [SupervisorD configuration](./sample-supervisord-config) to **/etc/supervisor/conf.d**.
-Issue `sudo supervisorctl reload` followed by `sudo supervisorctl start dsmr_native_logger`.
+Download the Debian packages from the [release area](https://github.com/mthmulders/dsmr-rs/releases).
+Copy it to the machine where you want to run the process and install it with `dpkg -i  dsmr-rs_0.1.0_<arch>.deb`.
+Edit `/etc/dsmr-rs.conf` to tailor your configuration.
+Finally, run `sudo service dsmr-rs restart` to make your changes effective.
 
 ## Efficiency
 The standard datalogger that ships with DSMR reader is written in Python.
@@ -25,7 +27,3 @@ Run tests with `cargo t`.
 ### Building
 Build a debug binary with `cargo b`.
 For a release binary, add `--release`.
-
-If you want to run on a Raspberry Pi, you need to download the GNU Toolchain from ARM.
-[Cross Compiling Rust for the Raspberry Pi](https://chacin.dev/blog/cross-compiling-rust-for-the-raspberry-pi/) explains the details for that.
-After that, add `--target armv7-unknown-linux-gnueabihf` to the above command. 
