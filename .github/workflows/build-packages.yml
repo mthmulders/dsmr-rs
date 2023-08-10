@@ -60,7 +60,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
 
-      - name: Display structure of downloaded files
+      - name: Inspect downloaded binaries
         run: |
           file target/arm-unknown-linux-musleabihf/release/dsmr-rs
 
@@ -75,8 +75,9 @@ jobs:
         run: |
           cargo deb --target arm-unknown-linux-musleabihf --no-build --no-strip
 
-      - name: Display structure of package directory 
-        run: find target/debian/
+      - name: Inspect generated packages
+        run: |
+          find target/ -name "*.deb" -exec file {} \;
       
       - name: Upload Debian packages
         uses: actions/upload-artifact@v3.1.2
