@@ -73,7 +73,7 @@ jobs:
 
       - name: Create Debian package
         run: |
-          cargo deb --target arm-unknown-linux-musleabihf --strip
+          cargo deb --target arm-unknown-linux-musleabihf --strip --no-build
 
       - name: Display structure of package directory 
         run: find target/debian/
