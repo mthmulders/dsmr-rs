@@ -61,7 +61,9 @@ jobs:
           restore-keys: ${{ runner.os }}-cargo-
 
       - name: Display structure of downloaded files
-        run: find target/
+        run: |
+          ls -hl target/arm-unknown-linux-musleabihf/release/
+          file target/arm-unknown-linux-musleabihf/release/dsmr-rs
 
       - name: Prepare packaging
         run: |
