@@ -70,6 +70,7 @@ jobs:
           sudo apt update -y
           sudo apt install -y dpkg dpkg-dev liblzma-dev libssl-dev
           cargo install cargo-deb
+          rustup target add arm-unknown-linux-musleabihf
 
       - name: Create Debian package
         run: |
