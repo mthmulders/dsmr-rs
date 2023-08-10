@@ -3,8 +3,14 @@ name = "dsmr-rs"
 version = "0.1.0"
 authors = ["Maarten Mulders <mthmulders@noreply.github.com>"]
 edition = "2018"
+description = "A utility to ship 'smart meter' readings over HTTP"
+license = "MIT License"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[package.metadata.deb]
+maintainer = "Maarten Mulders"
+copyright = "2021 - 2023 Maarten Mulders"
 
 [dependencies]
 config = "0.13.3"
