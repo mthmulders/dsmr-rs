@@ -6,7 +6,7 @@ A utility tool to ship data from a smart energy meter over HTTP.
 
 ## Running
 Download the Debian packages from the [release area](https://github.com/mthmulders/dsmr-rs/releases).
-Copy it to the machine where you want to run the process and install it with `dpkg -i  dsmr-rs_0.1.0_<arch>.deb`.
+Copy it to the machine where you want to run the process and install it with `dpkg -i  dsmr-rs_<version>_<arch>.deb`.
 Edit `/etc/dsmr-rs.conf` to tailor your configuration.
 Finally, run `sudo service dsmr-rs restart` to make your changes effective.
 
