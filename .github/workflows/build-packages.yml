@@ -44,9 +44,10 @@ jobs:
         uses: actions/download-artifact@v3.0.2
         with:
           name: binaries
+          path: target/arm-unknown-linux-musleabihf/release/
 
       - name: Display structure of downloaded files
-        run: find . 
+        run: find target/
 
       - name: Create Debian package
         run: |
