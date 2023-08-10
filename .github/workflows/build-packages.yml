@@ -73,7 +73,7 @@ jobs:
 
       - name: Create Debian package
         run: |
-          cargo deb --target arm-unknown-linux-musleabihf --no-build --no-strip
+          cargo deb --target arm-unknown-linux-musleabihf --no-build --no-strip -v
 
       - name: Inspect generated packages
         run: |
