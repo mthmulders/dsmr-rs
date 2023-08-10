@@ -15,33 +15,18 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v3.5.3
 
-      - name: Download ARM Toolchain
-        run: |
-          pushd /tmp
-          wget -q "https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel/gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf.tar.xz?rev=302e8e98351048d18b6f5b45d472f406&hash=B981F1567677321994BE1231441CB60C7274BB3D" \
-            -O gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf.tar.xz
-          tar xf gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf.tar.xz
-
-      - name: Install cross-build dependencies
-        run: |
-          sudo apt update -y
-          sudo apt install -y gcc-arm-linux-gnueabihf
-
-      - name: Install armhf build dependencies
-        uses: ryankurte/action-apt@cec786efbd7f7a1402b78f489bcdcf9acba6e825
+      - name: Install cross-compilation tools
+        uses: taiki-e/setup-cross-toolchain-action@v1.15.0
         with:
-          arch: armhf
-          packages: "libssl-dev:armhf libudev-dev:armhf"
+          target: arm-unknown-linux-musleabihf
 
       - name: Perform build
         run: |
-          ./cross-compile-arm.sh
-        env:
-          ARMHF_TOOLCHAIN_PATH: "/tmp/gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf/"
+          cargo build --target arm-unknown-linux-musleabihf --release --features ""
       
       - name: Upload application
         uses: actions/upload-artifact@v3.1.2
         if: github.ref == 'refs/heads/main'
         with:
           name: dsmr-rs
-          path: target/armv7-unknown-linux-gnueabihf/release/dsmr-rs
+          path: target/arm-unknown-linux-musleabihf/release/dsmr-rs
