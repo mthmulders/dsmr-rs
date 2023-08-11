@@ -52,7 +52,7 @@ impl DelegatingConsumer {
 
         (0..targets.len())
             .map(|index| UploadConsumer::new(&targets[index]))
-            .map(|c| Box::new(c))
+            .map(Box::new)
             .for_each(|b| delegates.push(b));
 
         delegates.push(Box::new(counter));
