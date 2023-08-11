@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         with:
           name: executables
-          path: target/arm-unknown-linux-musleabihf/release/dsmr-rs
+          path: target/**/release/dsmr-rs
           retention-days: 1
 
   build-amd64:
@@ -72,7 +72,7 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         with:
           name: executables
-          path: target/x86_64-unknown-linux-gnu/release/dsmr-rs
+          path: target/**/release/dsmr-rs
           retention-days: 1
 
   build-packages:
@@ -101,9 +101,11 @@ jobs:
         uses: actions/download-artifact@v3.0.2
         with:
           name: executables
+          path: target/
 
       - name: Inspect downloaded binaries
         run: |
+          ls -hl target/
           file target/x86_64-unknown-linux-gnu/release/dsmr-rs
           file target/arm-unknown-linux-musleabihf/release/dsmr-rs
 
