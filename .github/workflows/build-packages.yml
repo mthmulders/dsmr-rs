@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v3.5.3
 
       - name: Set up Cargo cache
-        uses: actions/cache@v3.3.1
+        uses: actions/cache/restore@v3.3.1
         continue-on-error: false
         with:
           path: |
@@ -39,7 +39,7 @@ jobs:
           cargo build --target arm-unknown-linux-musleabihf --release --features ""
 
       - name: Store Cargo cache
-        uses: actions/cache@v3.3.1
+        uses: actions/cache/save@v3.3.1
         continue-on-error: false
         if: always()
         with:
@@ -50,7 +50,6 @@ jobs:
             ~/.cargo/git/db/
             target/            
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
 
   build-amd64:
     runs-on: ubuntu-latest
@@ -59,7 +58,7 @@ jobs:
         uses: actions/checkout@v3.5.3
 
       - name: Set up Cargo cache
-        uses: actions/cache@v3.3.1
+        uses: actions/cache/restore@v3.3.1
         continue-on-error: false
         with:
           path: |
@@ -76,7 +75,7 @@ jobs:
           cargo build --release --features ""
 
       - name: Store Cargo cache
-        uses: actions/cache@v3.3.1
+        uses: actions/cache/save@v3.3.1
         continue-on-error: false
         if: always()
         with:
@@ -87,7 +86,6 @@ jobs:
             ~/.cargo/git/db/
             target/            
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
 
   build-packages:
     runs-on: ubuntu-latest
