@@ -1,4 +1,4 @@
-name: Build Debian packages for Raspberry Pi
+name: Build Debian packages
 
 on:
   push:
