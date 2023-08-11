@@ -1,3 +1,4 @@
+pub mod logger;
 pub mod reader;
 pub mod sender;
 pub mod settings;
