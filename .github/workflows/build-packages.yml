@@ -8,7 +8,7 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  build:
+  build-arm:
     runs-on: ubuntu-latest
     # Consider creating a matrix to also include armv7-unknown-linux-musleabihf
 
@@ -37,10 +37,33 @@ jobs:
       - name: Perform build
         run: |
           cargo build --target arm-unknown-linux-musleabihf --release --features ""
+  
+  build-amd64:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3.5.3
+
+      - name: Set up Cargo cache
+        uses: actions/cache@v3.3.1
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/            
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Perform build
+        run: |
+          cargo build --release --features ""
 
   package:
     runs-on: ubuntu-latest
-    needs: [ build ]
+    needs: [ build-arm, build-amd64 ]
     steps:
       - name: Checkout sources
         uses: actions/checkout@v3.5.3
@@ -62,6 +85,7 @@ jobs:
 
       - name: Inspect downloaded binaries
         run: |
+          file target/release/dsmr-rs
           file target/arm-unknown-linux-musleabihf/release/dsmr-rs
 
       - name: Prepare packaging
@@ -74,6 +98,7 @@ jobs:
       - name: Create Debian package
         run: |
           cargo deb --target arm-unknown-linux-musleabihf --no-build --no-strip -v
+          cargo deb --no-build --no-strip -v
 
       - name: Inspect generated packages
         run: |
