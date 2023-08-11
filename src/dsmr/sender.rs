@@ -2,6 +2,9 @@ use super::settings;
 
 use std::collections::HashMap;
 
+use crate::dsmr::TelegramConsumer;
+use crate::dsmr::logger::LoggingConsumer;
+
 struct UploadConsumer {
     host: String,
     key: String,
@@ -39,20 +42,26 @@ impl super::TelegramConsumer for UploadConsumer {
 }
 
 pub struct DelegatingConsumer {
-    delegates: Vec<UploadConsumer>,
+    delegates: Vec<Box<dyn TelegramConsumer>>,
 }
 impl DelegatingConsumer {
     pub fn new(targets: Vec<settings::Host>) -> Self {
-        let delegates = (0..targets.len())
-            .map(|index| UploadConsumer::new(&targets[index]))
-            .collect::<Vec<UploadConsumer>>();
+        let mut delegates: Vec<Box<dyn TelegramConsumer>> = Vec::with_capacity(targets.len() + 1);
 
+        let counter = LoggingConsumer::new(targets.len() as u32);
+
+        (0..targets.len())
+            .map(|index| UploadConsumer::new(&targets[index]))
+            .map(|c| Box::new(c))
+            .for_each(|b| delegates.push(b));
+
+        delegates.push(Box::new(counter));
+        
         DelegatingConsumer { delegates }
     }
 }
 impl super::TelegramConsumer for DelegatingConsumer {
     fn consume(&mut self, telegram: &str) {
-        log::info!("Uploading telegram to {} hosts", self.delegates.len());
         for delegate in &mut self.delegates {
             delegate.consume(telegram);
         }
