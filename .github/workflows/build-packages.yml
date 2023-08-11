@@ -61,7 +61,7 @@ jobs:
         run: |
           cargo build --release --features ""
 
-  package:
+  build-packages:
     runs-on: ubuntu-latest
     needs: [ build-arm, build-amd64 ]
     steps:
