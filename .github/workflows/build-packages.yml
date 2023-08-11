@@ -37,7 +37,21 @@ jobs:
       - name: Perform build
         run: |
           cargo build --target arm-unknown-linux-musleabihf --release --features ""
-  
+
+      - name: Store Cargo cache
+        uses: actions/cache@v3.3.1
+        continue-on-error: false
+        if: always()
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/            
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
   build-amd64:
     runs-on: ubuntu-latest
     steps:
@@ -60,6 +74,20 @@ jobs:
       - name: Perform build
         run: |
           cargo build --release --features ""
+
+      - name: Store Cargo cache
+        uses: actions/cache@v3.3.1
+        continue-on-error: false
+        if: always()
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/            
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
 
   build-packages:
     runs-on: ubuntu-latest
