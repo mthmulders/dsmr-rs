@@ -1,4 +1,4 @@
-name: Build Debian packages for Raspberry Pi
+name: Build Debian packages
 
 on:
   push:
@@ -9,8 +9,14 @@ on:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        target:
+          - arm-unknown-linux-musleabihf
+          - x86_64-unknown-linux-gnu
+          # Consider adding armv7-unknown-linux-musleabihf
+
     runs-on: ubuntu-latest
-    # Consider creating a matrix to also include armv7-unknown-linux-musleabihf
 
     steps:
       - name: Checkout sources
@@ -31,14 +37,22 @@ jobs:
 
       - name: Install cross-compilation tools
         uses: taiki-e/setup-cross-toolchain-action@v1.15.0
+        if: ${{ matrix.target }} != 'x86_64-unknown-linux-gnu'
         with:
-          target: arm-unknown-linux-musleabihf
+          target: ${{ matrix.target }}
 
       - name: Perform build
         run: |
-          cargo build --target arm-unknown-linux-musleabihf --release --features ""
+          cargo build --target ${{ matrix.target }} --release --features ""
 
-  package:
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: executables
+          path: target/**/release/dsmr-rs
+          retention-days: 1
+
+  build-packages:
     runs-on: ubuntu-latest
     needs: [ build ]
     steps:
@@ -60,8 +74,16 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
 
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: executables
+          path: target/
+
       - name: Inspect downloaded binaries
         run: |
+          ls -hl target/
+          file target/x86_64-unknown-linux-gnu/release/dsmr-rs
           file target/arm-unknown-linux-musleabihf/release/dsmr-rs
 
       - name: Prepare packaging
@@ -74,6 +96,7 @@ jobs:
       - name: Create Debian package
         run: |
           cargo deb --target arm-unknown-linux-musleabihf --no-build --no-strip -v
+          cargo deb --target x86_64-unknown-linux-gnu --no-build --no-strip -v
 
       - name: Inspect generated packages
         run: |
@@ -84,4 +107,6 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           name: packages
-          path: target/arm-unknown-linux-musleabihf/debian/
+          path: |
+            target/arm-unknown-linux-musleabihf/debian/
+            target/x86_64-unknown-linux-gnu/debian/
