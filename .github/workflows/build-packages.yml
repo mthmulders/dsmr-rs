@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v3.5.3
 
       - name: Set up Cargo cache
-        uses: actions/cache/restore@v3.3.1
+        uses: actions/cache@v3.3.1
         continue-on-error: false
         with:
           path: |
@@ -38,18 +38,12 @@ jobs:
         run: |
           cargo build --target arm-unknown-linux-musleabihf --release --features ""
 
-      - name: Store Cargo cache
-        uses: actions/cache/save@v3.3.1
-        continue-on-error: false
-        if: always()
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3.1.2
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/            
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          name: executables
+          path: target/arm-unknown-linux-musleabihf/release/dsmr-rs
+          retention-days: 1
 
   build-amd64:
     runs-on: ubuntu-latest
@@ -58,7 +52,7 @@ jobs:
         uses: actions/checkout@v3.5.3
 
       - name: Set up Cargo cache
-        uses: actions/cache/restore@v3.3.1
+        uses: actions/cache@v3.3.1
         continue-on-error: false
         with:
           path: |
@@ -72,20 +66,14 @@ jobs:
 
       - name: Perform build
         run: |
-          cargo build --release --features ""
+          cargo build --target x86_64-unknown-linux-gnu --release --features ""
 
-      - name: Store Cargo cache
-        uses: actions/cache/save@v3.3.1
-        continue-on-error: false
-        if: always()
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3.1.2
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/            
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          name: executables
+          path: target/x86_64-unknown-linux-gnu/release/dsmr-rs
+          retention-days: 1
 
   build-packages:
     runs-on: ubuntu-latest
@@ -109,9 +97,14 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
 
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v3.0.2
+        with:
+          name: executables
+
       - name: Inspect downloaded binaries
         run: |
-          file target/release/dsmr-rs
+          file target/x86_64-unknown-linux-gnu/release/dsmr-rs
           file target/arm-unknown-linux-musleabihf/release/dsmr-rs
 
       - name: Prepare packaging
@@ -124,7 +117,7 @@ jobs:
       - name: Create Debian package
         run: |
           cargo deb --target arm-unknown-linux-musleabihf --no-build --no-strip -v
-          cargo deb --no-build --no-strip -v
+          cargo deb --target x86_64-unknown-linux-gnu --no-build --no-strip -v
 
       - name: Inspect generated packages
         run: |
@@ -135,4 +128,6 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           name: packages
-          path: target/arm-unknown-linux-musleabihf/debian/
+          path: |
+            target/arm-unknown-linux-musleabihf/debian/
+            target/x86_64-unknown-linux-gnu/debian/
