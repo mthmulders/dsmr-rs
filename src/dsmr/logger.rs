@@ -4,7 +4,10 @@ pub struct LoggingConsumer {
 }
 impl LoggingConsumer {
     pub fn new(host_counter: u32) -> Self {
-        LoggingConsumer { host_counter: host_counter, telegram_counter: 0 }
+        LoggingConsumer {
+            host_counter,
+            telegram_counter: 0,
+        }
     }
 }
 impl super::TelegramConsumer for LoggingConsumer {

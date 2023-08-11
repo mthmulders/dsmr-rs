@@ -2,8 +2,8 @@ use super::settings;
 
 use std::collections::HashMap;
 
-use crate::dsmr::TelegramConsumer;
 use crate::dsmr::logger::LoggingConsumer;
+use crate::dsmr::TelegramConsumer;
 
 struct UploadConsumer {
     host: String,
@@ -56,7 +56,7 @@ impl DelegatingConsumer {
             .for_each(|b| delegates.push(b));
 
         delegates.push(Box::new(counter));
-        
+
         DelegatingConsumer { delegates }
     }
 }
