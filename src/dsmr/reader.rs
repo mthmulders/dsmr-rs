@@ -6,19 +6,6 @@ use std::io::BufReader;
 use std::str;
 use std::time::Duration;
 
-// For troubleshooting purposes...
-// struct PrintConsumer {}
-// impl PrintConsumer {
-//     fn new() -> Self {
-//         PrintConsumer {}
-//     }
-// }
-// impl super::TelegramConsumer for PrintConsumer {
-//     fn consume(&mut self, telegram: &str) {
-//         println!("Found telegram:\n{}", telegram)
-//     }
-// }
-
 fn find_start_of_telegram(buffer: &str) -> Option<usize> {
     buffer.find('/')
 }
