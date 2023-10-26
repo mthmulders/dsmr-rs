@@ -37,8 +37,7 @@ fn read_serial_settings(settings: &HashMap<String, String>) -> Result<SerialSett
         },
         None => return Err("Setting serial_baudrate not defined".to_string()),
     };
-    let x = settings.get("serial_parity");
-    let parity_bit = match x {
+    let parity_bit = match settings.get("serial_parity") {
         Some(value) => match value.as_str() {
             "O" => ParityBitSetting::Odd,
             "E" => ParityBitSetting::Even,
