@@ -12,6 +12,7 @@ pub struct SerialSettings {
     pub port: String,
     pub baud_rate: u32,
     pub parity_bit: ParityBitSetting,
+    pub byte_size: u8,
 }
 
 pub struct Host {
@@ -46,11 +47,16 @@ fn read_serial_settings(settings: &HashMap<String, String>) -> Result<SerialSett
         },
         None => ParityBitSetting::None,
     };
+    let byte_size = match settings.get("serial_bytesize") {
+        Some(value) => value.parse::<u8>().unwrap(),
+        None => 8
+    };
 
     Ok(SerialSettings {
         port: serial_port.to_string(),
         baud_rate: serial_baudrate,
         parity_bit,
+        byte_size,
     })
 }
 
@@ -176,6 +182,20 @@ mod tests {
         assert_eq!(result.is_ok(), true);
         let value = result.unwrap();
         assert_eq!(value.parity_bit, ParityBitSetting::Even);
+    }
+
+    #[test]
+    fn read_serial_settings_with_byte_size_seven() {
+        let mut settings = HashMap::new();
+        settings.insert(String::from("serial_port"), String::from("/dev/ttyUSB0"));
+        settings.insert(String::from("serial_baudrate"), String::from("9600"));
+        settings.insert(String::from("serial_bytesize"), String::from("7"));
+
+        let result = read_serial_settings(&settings);
+
+        assert_eq!(result.is_ok(), true);
+        let value = result.unwrap();
+        assert_eq!(value.byte_size, 7);
     }
 
     #[test]
