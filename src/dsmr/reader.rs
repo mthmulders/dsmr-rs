@@ -2,10 +2,8 @@ use super::settings;
 use super::settings::ParityBitSetting;
 
 use std::borrow::Cow;
-use std::fs;
 use std::io::BufRead;
 use std::io::BufReader;
-use std::path::PathBuf;
 use std::str;
 use std::time::Duration;
 
@@ -151,6 +149,9 @@ fn to_databits(input: &u8) -> serialport::DataBits {
 
 #[cfg(test)]
 mod tests {
+    use std::fs;
+    use std::path::PathBuf;
+
     #[allow(unused_imports)]
     use super::*;
 
