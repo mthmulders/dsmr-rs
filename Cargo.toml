@@ -1,6 +1,6 @@
 [package]
 name = "dsmr-rs"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Maarten Mulders <mthmulders@noreply.github.com>"]
 edition = "2018"
 description = "A utility to ship 'smart meter' readings over HTTP"
