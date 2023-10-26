@@ -2,8 +2,10 @@ use super::settings;
 use super::settings::ParityBitSetting;
 
 use std::borrow::Cow;
+use std::fs;
 use std::io::BufRead;
 use std::io::BufReader;
+use std::path::PathBuf;
 use std::str;
 use std::time::Duration;
 
@@ -14,10 +16,11 @@ fn find_start_of_telegram(buffer: &str) -> Option<usize> {
 fn find_end_of_telegram(buffer: &str, from: usize) -> Option<usize> {
     match buffer[from..].find('!') {
         Some(excl_mark) => {
+            let remainder = &buffer[(from + excl_mark + 1)..];
             // Not all meters send the checksum; some simply have a last line with just '!'
-            match buffer[(excl_mark + 1)..].find('\n') {
+            match remainder.find('\n') {
                 Some(line_end) => {
-                    let end = excl_mark + line_end + 1;
+                    let end = from + excl_mark + line_end + 1;
                     log::trace!(
                         "Exclamation mark with line ending found at index {}, returning index {}",
                         excl_mark,
@@ -251,5 +254,28 @@ mod tests {
             "/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)\r\n!\r\n"
         );
         assert_eq!(result, "\r\n/ISk5\\2MT382-1000");
+    }
+
+    #[test]
+    fn eat_complete_telegram() {
+        let mut input = read_test_resource("input1.txt".into());
+        let mut consumer = TestConsumer::new();
+
+        let _result = eat_telegrams(&mut input, &mut consumer);
+
+        assert_eq!(consumer.invoked, true);
+        assert_eq!(consumer.telegram, read_test_resource("output1.txt".into()),);
+    }
+
+    fn read_test_resource(path: PathBuf) -> String {
+        let mut test_file = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        test_file.push("resources/test/");
+        test_file.push(path);
+
+        let mut binding = fs::read_to_string(test_file).expect("Failed to read file");
+        let text = binding.as_mut_str();
+        return String::from(text);
+
+        // return fs::read_to_string(test_file).expect("Failed to read file").as_mut_str();
     }
 }
