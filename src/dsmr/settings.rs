@@ -49,7 +49,7 @@ fn read_serial_settings(settings: &HashMap<String, String>) -> Result<SerialSett
     };
     let byte_size = match settings.get("serial_bytesize") {
         Some(value) => value.parse::<u8>().unwrap(),
-        None => 8
+        None => 8,
     };
 
     Ok(SerialSettings {
