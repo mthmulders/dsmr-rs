@@ -1,4 +1,5 @@
 use super::settings;
+use super::settings::ParityBitSetting;
 
 use std::borrow::Cow;
 use std::io::BufRead;
@@ -107,21 +108,30 @@ pub fn connect_to_meter(
     consumer: &mut dyn super::TelegramConsumer,
 ) {
     log::info!(
-        "Connecting to {} using baud rate {}",
+        "Connecting to {} using baud rate {} and parity bit {:#?}",
         &serial_settings.port,
-        &serial_settings.baud_rate
+        &serial_settings.baud_rate,
+        &serial_settings.parity_bit
     );
 
     let mut port = serialport::new(&serial_settings.port, serial_settings.baud_rate)
         .data_bits(serialport::DataBits::Seven)
         .flow_control(serialport::FlowControl::None)
-        .parity(serialport::Parity::Even)
+        .parity(to_serial_port_parity_bit(&serial_settings.parity_bit))
         .stop_bits(serialport::StopBits::One)
         .timeout(Duration::from_secs(20))
         .open()
         .expect("Failed to open port");
 
     read_from_serial_port(&mut *port, consumer);
+}
+
+fn to_serial_port_parity_bit(input: &ParityBitSetting) -> serialport::Parity {
+    match input {
+        ParityBitSetting::Even => serialport::Parity::Even,
+        ParityBitSetting::None => serialport::Parity::None,
+        ParityBitSetting::Odd => serialport::Parity::Odd,
+    }
 }
 
 #[cfg(test)]

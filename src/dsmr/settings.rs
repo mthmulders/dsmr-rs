@@ -1,9 +1,18 @@
 use std::collections::HashMap;
 use std::result::Result;
 
+#[derive(Debug)]
+#[derive(PartialEq)]    
+pub enum ParityBitSetting {
+    None,
+    Even,
+    Odd
+}
+
 pub struct SerialSettings {
     pub port: String,
     pub baud_rate: u32,
+    pub parity_bit: ParityBitSetting,
 }
 
 pub struct Host {
@@ -29,10 +38,21 @@ fn read_serial_settings(settings: &HashMap<String, String>) -> Result<SerialSett
         },
         None => return Err("Setting serial_baudrate not defined".to_string()),
     };
+    let x = settings.get("serial_parity");
+    let parity_bit = match x {
+        Some(value) => match value.as_str() {
+            "O" => ParityBitSetting::Odd,
+            "E" => ParityBitSetting::Even,
+            "N" => ParityBitSetting::None,
+            &_ => return Err("Value for party_bit not valid".to_string()),
+        }
+        None => ParityBitSetting::None,
+    };
 
     Ok(SerialSettings {
         port: serial_port.to_string(),
         baud_rate: serial_baudrate,
+        parity_bit: parity_bit
     })
 }
 
@@ -130,6 +150,34 @@ mod tests {
         let result = read_serial_settings(&settings);
 
         assert_eq!(result.is_err(), true);
+    }
+
+    #[test]
+    fn read_serial_settings_with_parity_bit_odd() {
+        let mut settings = HashMap::new();
+        settings.insert(String::from("serial_port"), String::from("/dev/ttyUSB0"));
+        settings.insert(String::from("serial_baudrate"), String::from("9600"));
+        settings.insert(String::from("serial_parity"), String::from("O"));
+        
+        let result = read_serial_settings(&settings);
+
+        assert_eq!(result.is_ok(), true);
+        let value = result.unwrap();
+        assert_eq!(value.parity_bit, ParityBitSetting::Odd);
+    }
+
+    #[test]
+    fn read_serial_settings_with_parity_bit_even() {
+        let mut settings = HashMap::new();
+        settings.insert(String::from("serial_port"), String::from("/dev/ttyUSB0"));
+        settings.insert(String::from("serial_baudrate"), String::from("9600"));
+        settings.insert(String::from("serial_parity"), String::from("E"));
+        
+        let result = read_serial_settings(&settings);
+
+        assert_eq!(result.is_ok(), true);
+        let value = result.unwrap();
+        assert_eq!(value.parity_bit, ParityBitSetting::Even);
     }
 
     #[test]
