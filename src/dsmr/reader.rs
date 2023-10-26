@@ -108,14 +108,15 @@ pub fn connect_to_meter(
     consumer: &mut dyn super::TelegramConsumer,
 ) {
     log::info!(
-        "Connecting to {} using baud rate {} and parity bit {:#?}",
+        "Connecting to {} using baud rate {}, byte size {} and parity bit {:#?}",
         &serial_settings.port,
         &serial_settings.baud_rate,
+        &serial_settings.byte_size,
         &serial_settings.parity_bit
     );
 
     let mut port = serialport::new(&serial_settings.port, serial_settings.baud_rate)
-        .data_bits(serialport::DataBits::Seven)
+        .data_bits(to_databits(&serial_settings.byte_size))
         .flow_control(serialport::FlowControl::None)
         .parity(to_serial_port_parity_bit(&serial_settings.parity_bit))
         .stop_bits(serialport::StopBits::One)
@@ -131,6 +132,17 @@ fn to_serial_port_parity_bit(input: &ParityBitSetting) -> serialport::Parity {
         ParityBitSetting::Even => serialport::Parity::Even,
         ParityBitSetting::None => serialport::Parity::None,
         ParityBitSetting::Odd => serialport::Parity::Odd,
+    }
+}
+
+fn to_databits(input: &u8) -> serialport::DataBits {
+    match input {
+        0..=4 => serialport::DataBits::Eight,
+        5 => serialport::DataBits::Five,
+        6 => serialport::DataBits::Six,
+        7 => serialport::DataBits::Seven,
+        8 => serialport::DataBits::Eight,
+        9..=u8::MAX => serialport::DataBits::Eight,
     }
 }
 
