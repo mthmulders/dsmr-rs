@@ -51,7 +51,7 @@ fn read_serial_settings(settings: &HashMap<String, String>) -> Result<SerialSett
     Ok(SerialSettings {
         port: serial_port.to_string(),
         baud_rate: serial_baudrate,
-        parity_bit: parity_bit,
+        parity_bit,
     })
 }
 
