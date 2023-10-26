@@ -1,12 +1,11 @@
 use std::collections::HashMap;
 use std::result::Result;
 
-#[derive(Debug)]
-#[derive(PartialEq)]    
+#[derive(Debug, PartialEq)]
 pub enum ParityBitSetting {
     None,
     Even,
-    Odd
+    Odd,
 }
 
 pub struct SerialSettings {
@@ -45,14 +44,14 @@ fn read_serial_settings(settings: &HashMap<String, String>) -> Result<SerialSett
             "E" => ParityBitSetting::Even,
             "N" => ParityBitSetting::None,
             &_ => return Err("Value for party_bit not valid".to_string()),
-        }
+        },
         None => ParityBitSetting::None,
     };
 
     Ok(SerialSettings {
         port: serial_port.to_string(),
         baud_rate: serial_baudrate,
-        parity_bit: parity_bit
+        parity_bit: parity_bit,
     })
 }
 
@@ -158,7 +157,7 @@ mod tests {
         settings.insert(String::from("serial_port"), String::from("/dev/ttyUSB0"));
         settings.insert(String::from("serial_baudrate"), String::from("9600"));
         settings.insert(String::from("serial_parity"), String::from("O"));
-        
+
         let result = read_serial_settings(&settings);
 
         assert_eq!(result.is_ok(), true);
@@ -172,7 +171,7 @@ mod tests {
         settings.insert(String::from("serial_port"), String::from("/dev/ttyUSB0"));
         settings.insert(String::from("serial_baudrate"), String::from("9600"));
         settings.insert(String::from("serial_parity"), String::from("E"));
-        
+
         let result = read_serial_settings(&settings);
 
         assert_eq!(result.is_ok(), true);
