@@ -98,7 +98,7 @@ pub fn read_from_serial_port(
             let error = result.expect_err("Expected an error, but there is none?");
             log::info!("Read error {}, clearing buffer", error.to_string());
             // Just drop this telegram
-            buffer.clear(); 
+            buffer.clear();
         } else {
             let clone = buffer.clone();
 
@@ -113,9 +113,7 @@ pub fn read_from_serial_port(
     }
 }
 
-pub fn connect_to_meter(
-    serial_settings: settings::SerialSettings,
-) -> Box<dyn SerialPort> {
+pub fn connect_to_meter(serial_settings: settings::SerialSettings) -> Box<dyn SerialPort> {
     log::info!(
         "Connecting to {} using baud rate {}, byte size {} and parity bit {:#?}",
         &serial_settings.port,
