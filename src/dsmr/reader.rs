@@ -192,9 +192,10 @@ mod tests {
         }
     }
     impl super::super::TelegramConsumer for TestConsumer {
-        fn consume(&mut self, telegram: &str) -> () {
+        fn consume(&mut self, telegram: &str) -> bool {
             self.invoked = true;
             self.telegram = String::from(telegram);
+            true
         }
     }
 
