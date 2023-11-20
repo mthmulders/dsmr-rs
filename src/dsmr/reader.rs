@@ -1,6 +1,8 @@
 use super::settings;
 use super::settings::ParityBitSetting;
 
+use serialport::SerialPort;
+
 use std::borrow::Cow;
 use std::io::BufRead;
 use std::io::BufReader;
@@ -80,8 +82,8 @@ fn eat_telegrams<'a>(buffer: &'a str, consumer: &mut dyn super::TelegramConsumer
     }
 }
 
-fn read_from_serial_port(
-    port: &mut dyn serialport::SerialPort,
+pub fn read_from_serial_port(
+    port: Box<dyn SerialPort>,
     consumer: &mut dyn super::TelegramConsumer,
 ) {
     let reader = &mut BufReader::new(port);
@@ -90,24 +92,30 @@ fn read_from_serial_port(
 
     let mut buffer = String::new();
     loop {
-        reader.read_line(&mut buffer).expect("Could not read data");
+        let result = reader.read_line(&mut buffer);
 
-        let clone = buffer.clone();
+        if result.is_err() {
+            let error = result.expect_err("Expected an error, but there is none?");
+            log::info!("Read error {}, clearing buffer", error.to_string());
+            // Just drop this telegram
+            buffer.clear(); 
+        } else {
+            let clone = buffer.clone();
 
-        let new_buffer = eat_telegrams(&clone, consumer);
+            let new_buffer = eat_telegrams(&clone, consumer);
 
-        if buffer != new_buffer {
-            log::trace!("Replacing buffer {} with {}", buffer, new_buffer);
-            buffer.clear();
-            buffer.push_str(&new_buffer);
+            if buffer != new_buffer {
+                log::trace!("Replacing buffer {} with {}", buffer, new_buffer);
+                buffer.clear();
+                buffer.push_str(&new_buffer);
+            }
         }
     }
 }
 
 pub fn connect_to_meter(
     serial_settings: settings::SerialSettings,
-    consumer: &mut dyn super::TelegramConsumer,
-) {
+) -> Box<dyn SerialPort> {
     log::info!(
         "Connecting to {} using baud rate {}, byte size {} and parity bit {:#?}",
         &serial_settings.port,
@@ -116,7 +124,7 @@ pub fn connect_to_meter(
         &serial_settings.parity_bit
     );
 
-    let mut port = serialport::new(&serial_settings.port, serial_settings.baud_rate)
+    return serialport::new(&serial_settings.port, serial_settings.baud_rate)
         .data_bits(to_databits(&serial_settings.byte_size))
         .flow_control(serialport::FlowControl::None)
         .parity(to_serial_port_parity_bit(&serial_settings.parity_bit))
@@ -124,8 +132,6 @@ pub fn connect_to_meter(
         .timeout(Duration::from_secs(20))
         .open()
         .expect("Failed to open port");
-
-    read_from_serial_port(&mut *port, consumer);
 }
 
 fn to_serial_port_parity_bit(input: &ParityBitSetting) -> serialport::Parity {
