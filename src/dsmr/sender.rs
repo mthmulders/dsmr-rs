@@ -66,7 +66,7 @@ impl DelegatingConsumer {
     }
 }
 impl super::TelegramConsumer for DelegatingConsumer {
-    fn consume(&mut self, telegram: &str) -> bool {        
+    fn consume(&mut self, telegram: &str) -> bool {
         for delegate in &mut self.delegates {
             if delegate.consume(telegram) {
                 self.logger.consume(telegram);
