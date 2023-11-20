@@ -20,7 +20,7 @@ impl UploadConsumer {
     }
 }
 impl super::TelegramConsumer for UploadConsumer {
-    fn consume(&mut self, telegram: &str) {
+    fn consume(&mut self, telegram: &str) -> bool {
         log::trace!("- uploading telegram to {}", self.host);
         let url = [&self.host, "/api/v1/datalogger/dsmrreading"].join("");
 
@@ -35,35 +35,44 @@ impl super::TelegramConsumer for UploadConsumer {
             .send();
 
         match result {
-            Ok(response) => log::trace!("Got response with status {}", response.status()),
-            Err(msg) => log::warn!("Could not upload telegram due to {}", msg),
+            Ok(response) => {
+                log::trace!("Got response with status {}", response.status());
+                true
+            }
+            Err(msg) => {
+                log::warn!("Could not upload telegram due to {}", msg);
+                false
+            }
         }
     }
 }
 
 pub struct DelegatingConsumer {
     delegates: Vec<Box<dyn TelegramConsumer>>,
+    logger: LoggingConsumer,
 }
 impl DelegatingConsumer {
     pub fn new(targets: Vec<settings::Host>) -> Self {
         let mut delegates: Vec<Box<dyn TelegramConsumer>> = Vec::with_capacity(targets.len() + 1);
 
-        let counter = LoggingConsumer::new(targets.len() as u32);
+        let logger: LoggingConsumer = LoggingConsumer::new(targets.len() as u32);
 
         (0..targets.len())
             .map(|index| UploadConsumer::new(&targets[index]))
             .map(Box::new)
             .for_each(|b| delegates.push(b));
 
-        delegates.push(Box::new(counter));
-
-        DelegatingConsumer { delegates }
+        DelegatingConsumer { delegates, logger }
     }
 }
 impl super::TelegramConsumer for DelegatingConsumer {
-    fn consume(&mut self, telegram: &str) {
+    fn consume(&mut self, telegram: &str) -> bool {        
         for delegate in &mut self.delegates {
-            delegate.consume(telegram);
+            if delegate.consume(telegram) {
+                self.logger.consume(telegram);
+            }
         }
+
+        true // ignored anyway...
     }
 }

@@ -11,12 +11,13 @@ impl LoggingConsumer {
     }
 }
 impl super::TelegramConsumer for LoggingConsumer {
-    fn consume(&mut self, _telegram: &str) {
+    fn consume(&mut self, _telegram: &str) -> bool {
         self.telegram_counter += 1;
-        // We expect a telegram every 10 seconds -> 6 per minute -> 360 per hour.
-        if self.telegram_counter == 360 {
-            log::info!("Uploaded 360 telegrams to {} host(s)", self.host_counter);
+        if self.telegram_counter == 10000 {
+            log::info!("Uploaded 10000 telegrams to {} host(s)", self.host_counter);
             self.telegram_counter = 0;
         }
+
+        true
     }
 }
