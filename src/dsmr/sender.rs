@@ -52,7 +52,7 @@ pub struct DelegatingConsumer {
     logger: LoggingConsumer,
 }
 impl DelegatingConsumer {
-    pub fn new(targets: Vec<settings::Host>) -> Self {
+    pub fn new(targets: &Vec<settings::Host>) -> Self {
         let mut delegates: Vec<Box<dyn TelegramConsumer>> = Vec::with_capacity(targets.len() + 1);
 
         let logger: LoggingConsumer = LoggingConsumer::new(targets.len() as u32);

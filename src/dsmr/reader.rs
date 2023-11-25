@@ -3,9 +3,7 @@ use super::settings::ParityBitSetting;
 
 use serialport::SerialPort;
 
-use std::borrow::Cow;
-use std::io::BufRead;
-use std::io::BufReader;
+use std::io::{BufRead, BufReader};
 use std::str;
 use std::time::Duration;
 
@@ -42,11 +40,9 @@ fn find_end_of_telegram(buffer: &str, from: usize) -> Option<usize> {
 }
 
 // Scans the buffer to see if there is a telegram in it.
-// If so, invokes the consumer with that telegram.
-// Otherwise, clear the buffer (if there is no telegram unders construction)
-// or keep it intact (if a telegram is under construction).
-// Returns the new state of the buffer - which may be the unmodified buffer, or a new buffer.
-fn eat_telegrams<'a>(buffer: &'a str, consumer: &mut dyn super::TelegramConsumer) -> Cow<'a, str> {
+// If so, returns that telegram.
+// Otherwise, return nothing
+fn extract_telegram<'a>(buffer: &'a str) -> std::option::Option<&str> {
     let start_index = find_start_of_telegram(buffer);
     let end_index = find_end_of_telegram(buffer, start_index.unwrap_or(0));
 
@@ -59,25 +55,22 @@ fn eat_telegrams<'a>(buffer: &'a str, consumer: &mut dyn super::TelegramConsumer
                 end,
                 telegram
             );
-            consumer.consume(telegram);
-            let new_buffer = &buffer.replace(telegram, "");
-            log::trace!("Buffer {} truncated to {}", buffer, new_buffer);
-            Cow::Owned(String::from(new_buffer))
+            return Option::Some(telegram);
         }
         (None, Some(_)) => {
             log::trace!("No start of telegram, clearing buffer");
-            Cow::Owned(String::new())
+            return Option::None;
         }
         (Some(_), _) => {
             log::trace!("There is no end of the telegram, keeping buffer {}", buffer);
-            Cow::Borrowed(buffer)
+            return Option::None;
         }
         (None, None) => {
             log::trace!(
                 "There is no start and no end of the telegram, keeping buffer {}",
                 buffer
             );
-            Cow::Borrowed(buffer)
+            return Option::None;
         }
     }
 }
@@ -100,20 +93,18 @@ pub fn read_from_serial_port(
             // Just drop this telegram
             buffer.clear();
         } else {
-            let clone = buffer.clone();
-
-            let new_buffer = eat_telegrams(&clone, consumer);
-
-            if buffer != new_buffer {
-                log::trace!("Replacing buffer {} with {}", buffer, new_buffer);
-                buffer.clear();
-                buffer.push_str(&new_buffer);
+            match extract_telegram(&buffer) {
+                Some(telegram) => {
+                    consumer.consume(telegram);
+                    return;
+                }
+                None => {}
             }
         }
     }
 }
 
-pub fn connect_to_meter(serial_settings: settings::SerialSettings) -> Box<dyn SerialPort> {
+pub fn connect_to_meter(serial_settings: &settings::SerialSettings) -> Box<dyn SerialPort> {
     log::info!(
         "Connecting to {} using baud rate {}, byte size {} and parity bit {:#?}",
         &serial_settings.port,
@@ -179,98 +170,70 @@ mod tests {
         );
     }
 
-    struct TestConsumer {
-        invoked: bool,
-        telegram: String,
-    }
-    impl TestConsumer {
-        fn new() -> Self {
-            TestConsumer {
-                invoked: false,
-                telegram: String::new(),
-            }
-        }
-    }
-    impl super::super::TelegramConsumer for TestConsumer {
-        fn consume(&mut self, telegram: &str) -> bool {
-            self.invoked = true;
-            self.telegram = String::from(telegram);
-            true
-        }
+    #[test]
+    fn eat_telegrams_only_start_1() {
+        let text = String::from("/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)");
+
+        let result = extract_telegram(&text);
+
+        assert_eq!(result.is_none(), true);
     }
 
     #[test]
-    fn eat_telegrams_only_start() {
-        let text = String::from("/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)");
-        let mut consumer = TestConsumer::new();
-
-        let result = eat_telegrams(&text, &mut consumer);
-
-        assert_eq!(result, text);
-        assert_eq!(consumer.invoked, false);
-
+    fn eat_telegrams_only_start_2() {
         let text = String::from("/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)!");
-        let mut consumer = TestConsumer::new();
 
-        let result = eat_telegrams(&text, &mut consumer);
+        let result = extract_telegram(&text);
 
-        assert_eq!(result, text);
-        assert_eq!(consumer.invoked, false);
+        assert_eq!(result.is_none(), true);
     }
 
     #[test]
     fn eat_telegrams_only_end() {
         let text = String::from("0-1:24.4.0(1)\r\n!522B\r\n");
-        let mut consumer = TestConsumer::new();
 
-        let result = eat_telegrams(&text, &mut consumer);
+        let result = extract_telegram(&text);
 
-        assert_eq!(result, "");
-        assert_eq!(consumer.invoked, false);
+        assert_eq!(result.is_none(), true);
     }
 
     #[test]
     fn eat_telegrams_start_and_end() {
-        let mut text = String::from(
+        let text = String::from(
             "/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)\r\n!522B\r\n\r\n/ISk5\\2MT382-1000",
         );
-        let mut consumer = TestConsumer::new();
 
-        let result = eat_telegrams(&mut text, &mut consumer);
+        let result = extract_telegram(&text);
 
-        assert_eq!(consumer.invoked, true);
+        assert_eq!(result.is_some(), true);
         assert_eq!(
-            consumer.telegram,
+            result.unwrap(),
             "/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)\r\n!522B\r\n"
         );
-        assert_eq!(result, "\r\n/ISk5\\2MT382-1000");
     }
 
     #[test]
     fn eat_telegrams_without_checksum_start_and_end() {
-        let mut text =
+        let text =
             String::from("/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)\r\n!\r\n\r\n/ISk5\\2MT382-1000");
-        let mut consumer = TestConsumer::new();
 
-        let result = eat_telegrams(&mut text, &mut consumer);
+        let result = extract_telegram(&text);
 
-        assert_eq!(consumer.invoked, true);
+        assert_eq!(result.is_some(), true);
         assert_eq!(
-            consumer.telegram,
+            result.unwrap(),
             "/ISk5\\2MT382-1000\r\n\r\n1-3:0.2.8(40)\r\n!\r\n"
         );
-        assert_eq!(result, "\r\n/ISk5\\2MT382-1000");
     }
 
     #[test]
     fn eat_complete_telegram() {
-        let mut input = read_test_resource("input1.txt".into());
-        let mut consumer = TestConsumer::new();
+        let input = read_test_resource("input1.txt".into());
 
-        let _result = eat_telegrams(&mut input, &mut consumer);
+        let result = extract_telegram(&input);
 
-        assert_eq!(consumer.invoked, true);
-        assert_eq!(consumer.telegram, read_test_resource("output1.txt".into()),);
+        assert_eq!(result.is_some(), true);
+        assert_eq!(result.unwrap(), read_test_resource("output1.txt".into()),);
     }
 
     fn read_test_resource(path: PathBuf) -> String {
@@ -281,7 +244,5 @@ mod tests {
         let mut binding = fs::read_to_string(test_file).expect("Failed to read file");
         let text = binding.as_mut_str();
         return String::from(text);
-
-        // return fs::read_to_string(test_file).expect("Failed to read file").as_mut_str();
     }
 }
