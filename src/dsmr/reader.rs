@@ -42,7 +42,7 @@ fn find_end_of_telegram(buffer: &str, from: usize) -> Option<usize> {
 // Scans the buffer to see if there is a telegram in it.
 // If so, returns that telegram.
 // Otherwise, return nothing
-fn extract_telegram<'a>(buffer: &'a str) -> std::option::Option<&str> {
+fn extract_telegram(buffer: &str) -> std::option::Option<&str> {
     let start_index = find_start_of_telegram(buffer);
     let end_index = find_end_of_telegram(buffer, start_index.unwrap_or(0));
 
@@ -55,22 +55,22 @@ fn extract_telegram<'a>(buffer: &'a str) -> std::option::Option<&str> {
                 end,
                 telegram
             );
-            return Option::Some(telegram);
+            Option::Some(telegram)
         }
         (None, Some(_)) => {
             log::trace!("No start of telegram, clearing buffer");
-            return Option::None;
+            Option::None
         }
         (Some(_), _) => {
             log::trace!("There is no end of the telegram, keeping buffer {}", buffer);
-            return Option::None;
+            Option::None
         }
         (None, None) => {
             log::trace!(
                 "There is no start and no end of the telegram, keeping buffer {}",
                 buffer
             );
-            return Option::None;
+            Option::None
         }
     }
 }
@@ -92,14 +92,9 @@ pub fn read_from_serial_port(
             log::info!("Read error {}, clearing buffer", error.to_string());
             // Just drop this telegram
             buffer.clear();
-        } else {
-            match extract_telegram(&buffer) {
-                Some(telegram) => {
-                    consumer.consume(telegram);
-                    return;
-                }
-                None => {}
-            }
+        } else if let Some(telegram) = extract_telegram(&buffer) {
+            consumer.consume(telegram);
+            return;
         }
     }
 }
