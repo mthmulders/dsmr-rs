@@ -52,5 +52,13 @@ pub fn main() {
     log::info!("dsmr-rs starting...");
     let (serial_settings, api_settings) = dsmr::settings::settings(settings).unwrap();
 
+    log::info!(
+        "Using serial port {} with baud rate {}, byte size {} and parity bit {:#?}",
+        &serial_settings.port,
+        &serial_settings.baud_rate,
+        &serial_settings.byte_size,
+        &serial_settings.parity_bit
+    );
+
     scheduler::main_loop(api_settings, serial_settings, read_interval);
 }

@@ -100,14 +100,6 @@ pub fn read_from_serial_port(
 }
 
 pub fn connect_to_meter(serial_settings: &settings::SerialSettings) -> Box<dyn SerialPort> {
-    log::info!(
-        "Connecting to {} using baud rate {}, byte size {} and parity bit {:#?}",
-        &serial_settings.port,
-        &serial_settings.baud_rate,
-        &serial_settings.byte_size,
-        &serial_settings.parity_bit
-    );
-
     serialport::new(&serial_settings.port, serial_settings.baud_rate)
         .data_bits(to_databits(&serial_settings.byte_size))
         .flow_control(serialport::FlowControl::None)
