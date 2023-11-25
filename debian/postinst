@@ -30,6 +30,9 @@ DATALOGGER_INPUT_METHOD=serial
 # Baudrate for reading telegrams from the serial line.
 DATALOGGER_SERIAL_BAUDRATE=9600
 
+# The time in seconds that the datalogger will pause after each telegram written to the DSMR-reader API.
+DATALOGGER_SLEEP=5
+
 EOF
         # Ensure that the config file has the correct ownership
         chown ${PKG_USER}:${PKG_USER} ${PKG_CONF}

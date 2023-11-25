@@ -1,6 +1,5 @@
-use serialport::SerialPort;
-
 mod dsmr;
+mod scheduler;
 
 fn init_logger(debug_logging: bool) {
     let console_level = if debug_logging {
@@ -48,11 +47,18 @@ pub fn main() {
     let debug_logging = settings.get_bool("debug_logging").unwrap_or(false);
     init_logger(debug_logging);
 
+    let read_interval = settings.get_float("sleep").unwrap_or(0.5);
+
     log::info!("dsmr-rs starting...");
     let (serial_settings, api_settings) = dsmr::settings::settings(settings).unwrap();
-    let mut consumer = dsmr::sender::DelegatingConsumer::new(api_settings.hosts);
 
-    let port: Box<dyn SerialPort> = dsmr::reader::connect_to_meter(serial_settings);
+    log::info!(
+        "Using serial port {} with baud rate {}, byte size {} and parity bit {:#?}",
+        &serial_settings.port,
+        &serial_settings.baud_rate,
+        &serial_settings.byte_size,
+        &serial_settings.parity_bit
+    );
 
-    dsmr::reader::read_from_serial_port(port, &mut consumer);
+    scheduler::main_loop(api_settings, serial_settings, read_interval);
 }
