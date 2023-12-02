@@ -4,5 +4,5 @@ pub mod sender;
 pub mod settings;
 
 pub trait TelegramConsumer {
-    fn consume(&mut self, telegram: &str) -> bool;
+    fn consume(&mut self, telegram: &str);
 }

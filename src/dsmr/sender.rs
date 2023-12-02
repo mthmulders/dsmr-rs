@@ -20,7 +20,7 @@ impl UploadConsumer {
     }
 }
 impl super::TelegramConsumer for UploadConsumer {
-    fn consume(&mut self, telegram: &str) -> bool {
+    fn consume(&mut self, telegram: &str) {
         log::trace!("- uploading telegram to {}", self.host);
         let url = [&self.host, "/api/v1/datalogger/dsmrreading"].join("");
 
@@ -37,11 +37,9 @@ impl super::TelegramConsumer for UploadConsumer {
         match result {
             Ok(response) => {
                 log::trace!("Got response with status {}", response.status());
-                true
             }
             Err(msg) => {
                 log::warn!("Could not upload telegram due to {}", msg);
-                false
             }
         }
     }
@@ -66,13 +64,10 @@ impl DelegatingConsumer {
     }
 }
 impl super::TelegramConsumer for DelegatingConsumer {
-    fn consume(&mut self, telegram: &str) -> bool {
+    fn consume(&mut self, telegram: &str) {
         for delegate in &mut self.delegates {
-            if delegate.consume(telegram) {
-                self.logger.consume(telegram);
-            }
+            delegate.consume(telegram)
         }
-
-        true // ignored anyway...
+        self.logger.consume(telegram);
     }
 }

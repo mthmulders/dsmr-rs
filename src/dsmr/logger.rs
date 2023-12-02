@@ -11,13 +11,11 @@ impl LoggingConsumer {
     }
 }
 impl super::TelegramConsumer for LoggingConsumer {
-    fn consume(&mut self, _telegram: &str) -> bool {
+    fn consume(&mut self, _telegram: &str) {
         self.telegram_counter += 1;
         if self.telegram_counter == 10000 {
-            log::info!("Uploaded 10000 telegrams to {} host(s)", self.host_counter);
+            log::info!("Submitted 10000 telegrams to {} host(s)", self.host_counter);
             self.telegram_counter = 0;
         }
-
-        true
     }
 }
