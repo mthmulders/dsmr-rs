@@ -8,11 +8,11 @@ pub fn main_loop(
     read_interval: f64,
 ) {
     let interval = time::Duration::from_millis((read_interval * 1_000.0).round() as u64);
+    let mut consumer = dsmr::sender::DelegatingConsumer::new(&api_settings.hosts);
 
     loop {
         {
             let port = dsmr::reader::connect_to_meter(&serial_settings);
-            let mut consumer = dsmr::sender::DelegatingConsumer::new(&api_settings.hosts);
 
             dsmr::reader::read_from_serial_port(port, &mut consumer);
 
