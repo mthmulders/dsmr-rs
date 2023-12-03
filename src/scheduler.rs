@@ -20,10 +20,7 @@ pub fn main_loop(
             dsmr::reader::read_from_serial_port(port, &mut consumer);
             failure_count = 0;
         } else {
-            log::info!(
-                "failed to connect to {}",
-                &serial_settings.port,
-            );
+            log::info!("failed to connect to {}", &serial_settings.port);
             failure_count += 1;
         }
 

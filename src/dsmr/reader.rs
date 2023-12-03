@@ -99,7 +99,9 @@ pub fn read_from_serial_port(
     }
 }
 
-pub fn connect_to_meter(serial_settings: &settings::SerialSettings) -> Result<Box<dyn SerialPort>, Error> {
+pub fn connect_to_meter(
+    serial_settings: &settings::SerialSettings,
+) -> Result<Box<dyn SerialPort>, Error> {
     serialport::new(&serial_settings.port, serial_settings.baud_rate)
         .data_bits(to_databits(&serial_settings.byte_size))
         .flow_control(serialport::FlowControl::None)
