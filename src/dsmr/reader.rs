@@ -1,7 +1,7 @@
 use super::settings;
 use super::settings::ParityBitSetting;
 
-use serialport::SerialPort;
+use serialport::{Error, SerialPort};
 
 use std::io::{BufRead, BufReader};
 use std::str;
@@ -99,7 +99,9 @@ pub fn read_from_serial_port(
     }
 }
 
-pub fn connect_to_meter(serial_settings: &settings::SerialSettings) -> Box<dyn SerialPort> {
+pub fn connect_to_meter(
+    serial_settings: &settings::SerialSettings,
+) -> Result<Box<dyn SerialPort>, Error> {
     serialport::new(&serial_settings.port, serial_settings.baud_rate)
         .data_bits(to_databits(&serial_settings.byte_size))
         .flow_control(serialport::FlowControl::None)
@@ -107,7 +109,6 @@ pub fn connect_to_meter(serial_settings: &settings::SerialSettings) -> Box<dyn S
         .stop_bits(serialport::StopBits::One)
         .timeout(Duration::from_secs(20))
         .open()
-        .expect("Failed to open port")
 }
 
 fn to_serial_port_parity_bit(input: &ParityBitSetting) -> serialport::Parity {
