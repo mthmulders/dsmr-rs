@@ -83,8 +83,8 @@ jobs:
         run: |
           target=$(pwd)/target
           pushd /tmp/artifacts
-          find . -exec ls -hl {}\;
-          find . -exec file {}\;
+          find . -exec ls -hl {} \;
+          find . -exec file {} \;
           for d in *-executables
           do
               rm -Rf $ $target/$(echo $d | sed -e 's/-executables//g')
