@@ -81,42 +81,15 @@ jobs:
 
       - name: Move executables to target directory
         run: |
-          # target=$(pwd)/target
-          # pushd /tmp/artifacts
-          # echo Find all files and directories
-          # find . -exec ls -hl {} \;
-          # echo List all file types
-          # find . -type f -exec file {} \;
-          # for d in *-executables
-          # do
-          #     arch=$(echo $d | sed -e 's/-executables//g')
-          #     echo 1 List file types for $arch
-          #     find . -type f -exec file {} \;
-          #     mv -vf $d/* $target
-          #     # rm -Rf $target/$arch
-          #     # mv -vf $arch $target/
-          # done
-          # popd
-          # ls -hl target/
-          # echo Find all files and directories
-          # find . -exec ls -hl {} \;
-          # echo 98 List all file types
-          # find target/ -type f -exec file {} \;
-
           archs=("arm-unknown-linux-musleabihf" "x86_64-unknown-linux-gnu")
 
           for arch in ${archs[@]}; do
-            echo $arch
+            echo Copying binary for $arch
             mkdir -p target/$arch/release
             cp /tmp/artifacts/$arch-executables/$arch/release/dsmr-rs target/$arch/release/dsmr-rs
+            echo Verifying binary for $arch
+            file target/$arch/release/dsmr-rs
           done
-
-          # cp /tmp/artifacts/arm-unknown-linux-musleabihf-executables/arm-unknown-linux-musleabihf/release/dsmr-rs target/arm-unknown-linux-musleabihf/release/dsmr-rs
-          # cp /tmp/artifacts/x86_64-unknown-linux-gnu-executables/x86_64-unknown-linux-gnu/release/dsmr-rs target/x86_64-unknown-linux-gnu/release/dsmr-rs
-
-          echo 99 List file types of expected files
-          file target/x86_64-unknown-linux-gnu/release/dsmr-rs
-          file target/arm-unknown-linux-musleabihf/release/dsmr-rs
 
       - name: Prepare packaging
         run: |
