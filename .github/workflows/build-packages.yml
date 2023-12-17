@@ -89,8 +89,9 @@ jobs:
           find . -type f -exec file {} \;
           for d in *-executables
           do
-              mv -vf $(echo $d | sed -e 's/-executables//g')
-              mv -vf $(echo $d | sed -e 's/-executables//g') $target/
+              arch=$(echo $d | sed -e 's/-executables//g')
+              mv -vf $d $arch
+              mv -vf $arch $target/
           done
           popd
           ls -hl target/
