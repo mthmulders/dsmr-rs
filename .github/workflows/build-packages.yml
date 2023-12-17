@@ -46,9 +46,9 @@ jobs:
           cargo build --target ${{ matrix.target }} --release --features ""
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3.1.3
+        uses: actions/upload-artifact@v4.0.0
         with:
-          name: executables
+          name: ${{ matrix.target }}-executables
           path: target/**/release/dsmr-rs
           retention-days: 1
 
@@ -75,16 +75,21 @@ jobs:
           restore-keys: ${{ runner.os }}-cargo-
 
       - name: Download all build artifacts
-        uses: actions/download-artifact@v3.0.2
+        uses: actions/download-artifact@v4.0.0
         with:
-          name: executables
-          path: target/
+          path: /tmp/artifacts
 
-      - name: Inspect downloaded binaries
+      - name: Move executables to target directory
         run: |
-          ls -hl target/
-          file target/x86_64-unknown-linux-gnu/release/dsmr-rs
-          file target/arm-unknown-linux-musleabihf/release/dsmr-rs
+          archs=("arm-unknown-linux-musleabihf" "x86_64-unknown-linux-gnu")
+
+          for arch in ${archs[@]}; do
+            echo Copying binary for $arch
+            mkdir -p target/$arch/release
+            cp /tmp/artifacts/$arch-executables/$arch/release/dsmr-rs target/$arch/release/dsmr-rs
+            echo Verifying binary for $arch
+            file target/$arch/release/dsmr-rs
+          done
 
       - name: Prepare packaging
         run: |
@@ -103,7 +108,7 @@ jobs:
           find target/ -name "*.deb" -exec file {} \;
       
       - name: Upload Debian packages
-        uses: actions/upload-artifact@v3.1.3
+        uses: actions/upload-artifact@v4.0.0
         if: github.ref == 'refs/heads/main'
         with:
           name: packages
