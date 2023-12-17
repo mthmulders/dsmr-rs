@@ -83,21 +83,21 @@ jobs:
         run: |
           target=$(pwd)/target
           pushd /tmp/artifacts
-          echo Find all files and directories
-          find . -exec ls -hl {} \;
-          echo List all types
-          find . -type f -exec file {} \;
+          # echo Find all files and directories
+          # find . -exec ls -hl {} \;
+          # echo List all file types
+          # find . -type f -exec file {} \;
           for d in *-executables
           do
               arch=$(echo $d | sed -e 's/-executables//g')
               mv -vf $d $arch
-              mv -vf $arch $target/
+              mv -vf $arch/* $target/$arch/
           done
           popd
           ls -hl target/
           echo Find all files and directories
           find . -exec ls -hl {} \;
-          echo List all types
+          echo List all file types
           find . -type f -exec file {} \;
           file target/x86_64-unknown-linux-gnu/release/dsmr-rs
           file target/arm-unknown-linux-musleabihf/release/dsmr-rs
