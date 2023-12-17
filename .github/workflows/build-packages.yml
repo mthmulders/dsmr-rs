@@ -85,6 +85,7 @@ jobs:
           pushd /tmp/artifacts
           for d in *-executables
           do
+              rm -Rf $ $target/$(echo $d | sed -e 's/-executables//g')
               mv -vf $d $target/$(echo $d | sed -e 's/-executables//g')
           done
           popd
