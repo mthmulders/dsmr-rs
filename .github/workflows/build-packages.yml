@@ -93,6 +93,7 @@ jobs:
               echo 1 List file types
               find . -type f -exec file {} \;
               mv -vf $d $arch
+              rm -Rf $target/$arch
               mv -vf $arch $target/
           done
           popd
