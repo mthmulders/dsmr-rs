@@ -48,7 +48,7 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4.0.0
         with:
-          name: executables
+          name: ${{ matrix.target }}-executables
           path: target/**/release/dsmr-rs
           retention-days: 1
 
@@ -77,11 +77,11 @@ jobs:
       - name: Download all build artifacts
         uses: actions/download-artifact@v3.0.2
         with:
-          name: executables
-          path: target/
+          path: /tmp/artifacts
 
-      - name: Inspect downloaded binaries
+      - name: Restructure target directory
         run: |
+          mv -v /tmp/artifacts/* target/
           ls -hl target/
           file target/x86_64-unknown-linux-gnu/release/dsmr-rs
           file target/arm-unknown-linux-musleabihf/release/dsmr-rs
