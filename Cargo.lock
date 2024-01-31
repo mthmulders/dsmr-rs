@@ -194,7 +194,7 @@ dependencies = [
  "config",
  "log",
  "openssl",
- "openssl-src 300.1.6+3.1.4",
+ "openssl-src 300.2.2+3.2.1",
  "reqwest",
  "serialport",
  "simplelog",
@@ -709,9 +709,9 @@ dependencies = [
 
 [[package]]
 name = "openssl-src"
-version = "300.1.6+3.1.4"
+version = "300.2.2+3.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "439fac53e092cd7442a3660c85dde4643ab3b5bd39040912388dcdabf6b88085"
+checksum = "8bbfad0063610ac26ee79f7484739e2b07555a75c42453b89263830b5c8103bc"
 dependencies = [
  "cc",
 ]
