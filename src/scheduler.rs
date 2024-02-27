@@ -15,8 +15,7 @@ pub fn main_loop(
 
     loop {
         let result = dsmr::reader::connect_to_meter(&serial_settings);
-        if result.is_ok() {
-            let port = result.unwrap();
+        if let Ok(port) = result {
             dsmr::reader::read_from_serial_port(port, &mut consumer);
             failure_count = 0;
         } else {
