@@ -18,7 +18,7 @@ copyright = "2021 - 2023 Maarten Mulders"
 
 [dependencies]
 config = "0.14.0"
-log = "0.4.20"
+log = "0.4.21"
 simplelog = "0.12.1"
 
 [dependencies.serialport]
