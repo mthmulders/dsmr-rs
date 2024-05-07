@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v4.1.3
+        uses: actions/checkout@v4.1.5
 
       - name: Set up Cargo cache
         uses: actions/cache@v4.0.2
@@ -57,7 +57,7 @@ jobs:
     needs: [ build ]
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v4.1.3
+        uses: actions/checkout@v4.1.5
         with:
           fetch-depth: 0
 
