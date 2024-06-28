@@ -22,7 +22,7 @@ log = "0.4.21"
 simplelog = "0.12.2"
 
 [dependencies.serialport]
-version = "4.3.0"
+version = "4.4.0"
 default-features = false
 
 [dependencies.reqwest]
