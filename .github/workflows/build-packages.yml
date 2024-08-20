@@ -46,7 +46,7 @@ jobs:
           cargo build --target ${{ matrix.target }} --release --features ""
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4.3.4
+        uses: actions/upload-artifact@v4.3.3
         with:
           name: ${{ matrix.target }}-executables
           path: target/**/release/dsmr-rs
@@ -108,7 +108,7 @@ jobs:
           find target/ -name "*.deb" -exec file {} \;
       
       - name: Upload Debian packages
-        uses: actions/upload-artifact@v4.3.4
+        uses: actions/upload-artifact@v4.3.3
         if: github.ref == 'refs/heads/main'
         with:
           name: packages
