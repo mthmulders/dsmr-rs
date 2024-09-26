@@ -17,7 +17,7 @@ jobs:
       issues: write  # for rustsec/audit-check to create issues
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4.2.0
 
       - name: Install build requirements
         run: |
