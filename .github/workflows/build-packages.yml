@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4.1.7
 
       - name: Set up Cargo cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.1.2
         continue-on-error: false
         with:
           path: |
@@ -62,7 +62,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Cargo cache
-        uses: actions/cache@v4.0.2
+        uses: actions/cache@v4.1.2
         continue-on-error: false
         with:
           path: |
