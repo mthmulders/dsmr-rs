@@ -14,8 +14,8 @@ jobs:
         target:
           - arm-unknown-linux-musleabihf
           - armv7-unknown-linux-musleabihf
-          - armv8-unknown-linux-musleabihf
           - x86_64-unknown-linux-gnu
+          # Consider adding armv7-unknown-linux-musleabihf
 
     runs-on: ubuntu-latest
 
@@ -82,7 +82,7 @@ jobs:
 
       - name: Move executables to target directory
         run: |
-          archs=("armv8-unknown-linux-musleabihf" "armv7-unknown-linux-musleabihf" "arm-unknown-linux-musleabihf" "x86_64-unknown-linux-gnu")
+          archs=("armv7-unknown-linux-musleabihf" "arm-unknown-linux-musleabihf" "x86_64-unknown-linux-gnu")
 
           for arch in ${archs[@]}; do
             echo Copying binary for $arch
@@ -104,7 +104,6 @@ jobs:
         run: |
           cargo deb --target arm-unknown-linux-musleabihf --no-build --no-strip -v
           cargo deb --target armv7-unknown-linux-musleabihf --no-build --no-strip -v
-          cargo deb --target armv8-unknown-linux-musleabihf --no-build --no-strip -v
           cargo deb --target x86_64-unknown-linux-gnu --no-build --no-strip -v
 
       - name: Inspect generated packages
@@ -119,5 +118,4 @@ jobs:
           path: |
             target/arm-unknown-linux-musleabihf/debian/
             target/armv7-unknown-linux-musleabihf/debian/
-            target/armv8-unknown-linux-musleabihf/debian/
             target/x86_64-unknown-linux-gnu/debian/
