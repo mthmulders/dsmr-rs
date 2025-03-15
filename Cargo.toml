@@ -31,7 +31,7 @@ version = "4.7.0"
 default-features = false
 
 [dependencies.reqwest]
-version = "0.12.12"
+version = "0.12.14"
 features = [ "blocking" ]
 
 [dependencies.openssl]
