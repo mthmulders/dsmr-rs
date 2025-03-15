@@ -21,6 +21,11 @@ config = "0.14.0"
 log = "0.4.26"
 simplelog = "0.12.2"
 
+# Manually bump transitive dependency on 'ring' to
+# prevent RUSTSEC-2025-0009.
+[dependencies.ring]
+version = "0.17.12"
+
 [dependencies.serialport]
 version = "4.7.0"
 default-features = false
