@@ -41,4 +41,4 @@ features = [ "vendored" ]
 
 # Ensure we select OpenSSL 3.x
 [dependencies.openssl-src]
-version = "300.4.2+3.1.1"
+version = "300.5.0+3.1.1"
