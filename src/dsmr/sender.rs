@@ -19,6 +19,7 @@ impl UploadConsumer {
         }
     }
 }
+
 impl super::TelegramConsumer for UploadConsumer {
     fn consume(&mut self, telegram: &str) {
         log::trace!("- uploading telegram to {}", self.host);
