@@ -89,7 +89,7 @@ pub fn read_from_serial_port(
 
         if result.is_err() {
             let error = result.expect_err("Expected an error, but there is none?");
-            log::info!("Read error {}, clearing buffer", error.to_string());
+            log::info!("Read error {}, clearing buffer", error);
             // Just drop this telegram
             buffer.clear();
         } else if let Some(telegram) = extract_telegram(&buffer) {
