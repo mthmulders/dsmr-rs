@@ -35,7 +35,7 @@ version = "0.12.15"
 features = [ "blocking" ]
 
 [dependencies.openssl]
-version = "0.10.72"
+version = "0.10.73"
 # Build OpenSSL as part of building this crate
 features = [ "vendored" ]
 
